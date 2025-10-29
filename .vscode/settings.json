@@ -7,7 +7,7 @@
 
   // ESLint 문제도 자동으로 고치기
   "editor.codeActionsOnSave": {
-    "source.fixAll": true,
-    "source.fixAll.eslint": true
+    "source.fixAll": "explicit",
+    "source.fixAll.eslint": "explicit"
   }
 }
