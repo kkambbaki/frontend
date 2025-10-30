@@ -1,26 +1,75 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@layer base {
+  /* 모든 요소 기본 설정 */
+  * {
+    @apply box-border;
+  }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  /* HTML 스크롤 부드럽게 */
+  html {
+    @apply scroll-smooth;
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  /* Body 기본 스타일 */
+  body {
+    @apply bg-[#FFFCEA] font-sans text-main-text;
+    font-family: 'NanumSquareRound', sans-serif;
+  }
+
+  /* 링크 기본 스타일 */
+  a {
+    @apply text-inherit no-underline;
+  }
+
+  /* 버튼 기본 리셋 */
+  button {
+    @apply cursor-pointer;
+    border: none;
+    background: none;
+  }
+
+  /* ✅ 스크롤바 스타일 (Firefox) */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.4) transparent;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ✅ GeekbleMalrangiche */
+@font-face {
+  font-family: 'GeekbleMalrangiche';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302_01@1.0/GeekbleMalang2WOFF2.woff2')
+    format('woff2');
+  font-weight: normal;
+  font-display: swap;
+}
+
+/* ✅ NanumSquareRound */
+@font-face {
+  font-family: 'NanumSquareRound';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_two@1.0/NanumSquareRound.woff')
+    format('woff');
+  font-weight: normal;
+  font-display: swap;
+}
+
+@theme {
+  --color-background-header: #ffe3a7;
+  --color-main-text: #4d2d07;
+  --color-input-bg: #fbfbfb;
+  --color-input-border: #e3dbcb;
+  --color-placeholder-text: #c1bfbc;
+  --color-input-text: #535353;
+  --color-button-text: #d3770e;
+  --color-error-text: #ec4040;
+  --color-sub-button-bg: #e7e1d7;
+  --color-sub-button-text: #baab96;
+  --color-tooltip-text: #5f4423;
+  --color-button-bg: #ef9338;
+}
+
+@theme {
+  --font-malrang: 'GeekbleMalrangiche', sans-serif;
+  --font-nanum: 'NanumSquareRound', sans-serif;
 }
