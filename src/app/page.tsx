@@ -1,3 +1,4 @@
+import BaseButton from '@/components/common/BaseButton';
 import Image from 'next/image';
 
 export default function Home() {
@@ -14,11 +15,8 @@ export default function Home() {
 
           <p className="text-[32px] max-md:text-[25px]">보호자와 함께 플레이하세요!</p>
         </div>
-
-        {/* TODO: Button 컴포넌트 추가 */}
-        <p className="w-[280px] h-[100px] bg-amber-500 text-[46px] flex justify-center items-center">
-          시작하기
-        </p>
+                
+        <BaseButton variant="md">시작하기</BaseButton>
       </div>
     </main>
   );
