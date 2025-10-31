@@ -4,6 +4,10 @@
   /* 모든 요소 기본 설정 */
   * {
     @apply box-border;
+    padding: 0;
+    margin: 0;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.4) transparent;
   }
 
   /* HTML 스크롤 부드럽게 */
@@ -27,12 +31,6 @@
     @apply cursor-pointer;
     border: none;
     background: none;
-  }
-
-  /* ✅ 스크롤바 스타일 (Firefox) */
-  * {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(0, 0, 0, 0.4) transparent;
   }
 }
 
@@ -67,9 +65,29 @@
   --color-sub-button-text: #baab96;
   --color-tooltip-text: #5f4423;
   --color-button-bg: #ef9338;
+  --color-button-bg-bottom: #feac07;
 }
 
 @theme {
   --font-malrang: 'GeekbleMalrangiche', sans-serif;
   --font-nanum: 'NanumSquareRound', sans-serif;
+  --clip-button-curve: polygon(
+    0 0,
+    100% 0,
+    100% 50%,
+    90% 57%,
+    80% 60%,
+    70% 63.5%,
+    50% 65%,
+    30% 63.5%,
+    20% 60%,
+    10% 57%,
+    0 50%
+  );
+}
+
+@layer utilities {
+  .clip-button-curve {
+    clip-path: var(--clip-button-curve);
+  }
 }
