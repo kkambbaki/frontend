@@ -1,0 +1,63 @@
+'use client';
+
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Input } from '../common/input';
+import PrimaryButton from '../common/PrimaryButton';
+import RegistrationModal from './RegistrationModal';
+
+const PasswordBody = () => {
+  const router = useRouter();
+  const [password, setPassword] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const isConfirmDisabled = !password.trim() || password.length < 4;
+
+  const handleConfirm = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleModalConfirm = () => {
+    setIsModalOpen(false);
+    // TODO: 비밀번호 설정 처리 로직 추가
+    console.log('Password set:', password);
+    router.push('/start');
+  };
+
+  return (
+    <>
+      <div className="flex flex-col items-center">
+        <h2 className="text-[26px] mb-[94px] font-nanum font-extrabold text-[#53514F]">
+          아이의 학습 결과를 확인할 수 있는 레포트용 비밀번호를 설정해 주세요.
+        </h2>
+        <div className="flex justify-center mb-[54px]">
+          <Input
+            label="비밀번호 4자리 이상"
+            variant="default"
+            className="w-[426px]"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
+        <div className="flex justify-center">
+          <PrimaryButton
+            variant="xs"
+            color="orange"
+            disabled={isConfirmDisabled}
+            onClick={handleConfirm}
+          >
+            완료
+          </PrimaryButton>
+        </div>
+      </div>
+      <RegistrationModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={handleModalConfirm}
+      />
+    </>
+  );
+};
+
+export default PasswordBody;

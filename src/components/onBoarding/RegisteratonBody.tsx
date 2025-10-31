@@ -1,0 +1,53 @@
+'use client';
+
+import React, { useState } from 'react';
+import { Input } from '../common/input';
+import PrimaryButton from '../common/PrimaryButton';
+
+interface RegisteratonBodyProps {
+  onNext?: () => void;
+}
+
+const RegisteratonBody: React.FC<RegisteratonBodyProps> = ({ onNext }) => {
+  const [childName, setChildName] = useState('');
+  const [isBirthComplete, setIsBirthComplete] = useState(false);
+
+  const isConfirmDisabled = !childName.trim() || !isBirthComplete;
+
+  const handleConfirm = () => {
+    onNext?.(); 
+  };
+
+  return (
+    <div className="flex flex-col gap-[54px] w-[690px]">
+      <h2 className="text-[26px] font-nanum font-extrabold text-[#53514F]">
+        아이 정보를 알려주세요
+      </h2>
+      <div className="flex flex-col gap-[34px]">
+        <Input
+          label="아이 이름"
+          variant="text"
+          value={childName}
+          onChange={(e) => setChildName(e.target.value)}
+        />
+        <Input label="아이 생년/월" variant="birth" onBirthComplete={setIsBirthComplete} />
+        <Input label="아이 성별(선택)" variant="gender" />
+      </div>
+      <div className="flex justify-end gap-[26px]">
+        <PrimaryButton variant="xs" color="gray">
+          취소
+        </PrimaryButton>
+        <PrimaryButton
+          variant="xs"
+          color="orange"
+          disabled={isConfirmDisabled}
+          onClick={handleConfirm}
+        >
+          확인
+        </PrimaryButton>
+      </div>
+    </div>
+  );
+};
+
+export default RegisteratonBody;

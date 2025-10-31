@@ -157,7 +157,7 @@ const PrimaryButton: React.FC<PrimaryButtonProps> = ({
           backgroundColor: currentColor.topColor,
         }}
       />
-      {disabled && <div className="absolute inset-0 z-20 bg-[#00000033]" />}
+      {disabled && <div className="absolute inset-0 z-100 bg-[#00000033]" />}
       <span
         className="relative z-30 text-center"
         style={{

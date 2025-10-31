@@ -11,13 +11,32 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   required?: boolean;
   error?: boolean; // ⚠️ 에러 여부
   errorText?: string; // ⚠️ 에러 메시지
+  onBirthComplete?: (isComplete: boolean) => void; // 생년월일 완성 여부
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, variant = 'default', label, required, error, errorText, ...props }, ref) => {
+  (
+    {
+      className,
+      variant = 'default',
+      label,
+      required,
+      error,
+      errorText,
+      onBirthComplete,
+      ...props
+    },
+    ref
+  ) => {
     const [gender, setGender] = React.useState<'male' | 'female' | null>(null);
     const [year, setYear] = React.useState('');
     const [month, setMonth] = React.useState('');
+
+    React.useEffect(() => {
+      if (variant === 'birth' && onBirthComplete) {
+        onBirthComplete(!!(year && month));
+      }
+    }, [year, month, variant, onBirthComplete]);
 
     // 년 / 월 옵션
     const years = Array.from({ length: 100 }, (_, i) => `${new Date().getFullYear() - i}년`);
