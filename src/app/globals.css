@@ -66,6 +66,11 @@
   --color-tooltip-text: #5f4423;
   --color-button-bg: #ef9338;
   --color-button-bg-bottom: #feac07;
+  --color-progress-bar-bg: #d5c7b4;
+  --color-progress-bar-border: #d36a09;
+  --color-progress-bar-left: #ffab35;
+  --color-progress-bar-right: #f48c2a;
+  --color-progress-bar-text: #a28565;
 }
 
 @theme {

@@ -10,7 +10,7 @@ export default function Home() {
         <div className="flex flex-col items-center">
           <div className="flex flex-col-reverse items-center md:gap-6 md:flex-row md:justify-center">
             <p className="text-[100px] md:text-[140px] font-malrang">깜빡이</p>
-            <Image src="/character.png" alt="character" width={100} height={100} />
+            <Image src="/bulb.png" alt="character" width={100} height={100} />
           </div>
 
           <p className="text-[32px] max-md:text-[25px] font-malrang">보호자와 함께 플레이하세요!</p>
