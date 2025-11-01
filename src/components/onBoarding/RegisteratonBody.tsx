@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Input } from '../common/Input';
 import PrimaryButton from '../common/PrimaryButton';
+import { Input } from '../common/Input';
 
 interface RegisteratonBodyProps {
   onNext?: () => void;
