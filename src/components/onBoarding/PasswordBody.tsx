@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Input } from '../common/input';
+import { Input } from '../common/Input';
 import PrimaryButton from '../common/PrimaryButton';
 import RegistrationModal from './RegistrationModal';
 

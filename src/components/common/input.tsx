@@ -6,12 +6,12 @@ import { DropdownSelect } from '@/components/ui/dropdown-select';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   className?: string;
-  variant?: 'default' | 'birth' | 'text' | 'gender';
+  variant?: 'default' | 'birth' | 'text' | 'gender' | 'password';
   label?: string;
   required?: boolean;
-  error?: boolean; // ⚠️ 에러 여부
-  errorText?: string; // ⚠️ 에러 메시지
-  onBirthComplete?: (isComplete: boolean) => void; // 생년월일 완성 여부
+  error?: boolean;
+  errorText?: string;
+  onBirthComplete?: (isComplete: boolean) => void;
 }
 
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
@@ -76,6 +76,25 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
               {...props}
               className={cn(
                 'flex-1 bg-transparent outline-none text-input-text placeholder:text-placeholder-text text-right',
+                error && 'text-error-text placeholder:text-error-text'
+              )}
+            />
+          );
+
+        case 'password':
+          return (
+            <input
+              ref={ref}
+              {...props}
+              inputMode="numeric"
+              pattern="[0-9]*"
+              onChange={(e) => {
+                e.target.value = e.target.value.replace(/[^0-9]/g, '');
+                props.onChange?.(e);
+              }}
+              className={cn(
+                'flex-1 bg-transparent outline-none text-input-text placeholder:text-placeholder-text',
+                label ? 'text-right' : 'text-center text-3xl font-extrabold',
                 error && 'text-error-text placeholder:text-error-text'
               )}
             />
@@ -164,7 +183,16 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         </div>
 
         {/* 에러 텍스트 */}
-        {errorText && <p className="text-error-text text-sm ml-4 mt-1 leading-none">{errorText}</p>}
+        {errorText && (
+          <p
+            className={cn(
+              'text-error-text text-sm ml-4 mt-1 leading-none',
+              variant === 'password' && 'text-center text-[20px]'
+            )}
+          >
+            {errorText}
+          </p>
+        )}
       </div>
     );
   }
