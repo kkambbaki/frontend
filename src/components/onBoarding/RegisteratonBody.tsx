@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Input } from '../common/input';
 import PrimaryButton from '../common/PrimaryButton';
+import { Input } from '../common/Input';
 
 interface RegisteratonBodyProps {
   onNext?: () => void;
@@ -15,7 +15,7 @@ const RegisteratonBody: React.FC<RegisteratonBodyProps> = ({ onNext }) => {
   const isConfirmDisabled = !childName.trim() || !isBirthComplete;
 
   const handleConfirm = () => {
-    onNext?.(); 
+    onNext?.();
   };
 
   return (

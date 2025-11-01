@@ -2,9 +2,9 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Input } from '../common/input';
 import PrimaryButton from '../common/PrimaryButton';
 import RegistrationModal from './RegistrationModal';
+import { Input } from '../common/Input';
 
 const PasswordBody = () => {
   const router = useRouter();
