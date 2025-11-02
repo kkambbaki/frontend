@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 import ProgressBar from './components/ProgressBar';
+import BulbImage from '@/components/images/BulbImage';
 
 const Page = () => {
   const [progress, setProgress] = useState(0);
@@ -28,25 +29,7 @@ const Page = () => {
     <div className="w-full h-screen py-20 px-10 flex flex-col justify-around">
       <div className="flex flex-col items-center gap-10">
         <div className="relative w-[180px] h-[180px] max-md:w-[150px] max-md:h-[150px]">
-          {/* 켜진 전구 */}
-          <Image
-            src="/bulb.png"
-            alt="On bulb"
-            fill
-            className={`object-contain transition-opacity duration-700 ease-in-out ${
-              isOn ? 'opacity-100' : 'opacity-0'
-            }`}
-          />
-
-          {/* 꺼진 전구 */}
-          <Image
-            src="/off_bulb.png"
-            alt="Off bulb"
-            fill
-            className={`object-contain transition-opacity duration-700 ease-in-out ${
-              isOn ? 'opacity-0' : 'opacity-100'
-            }`}
-          />
+          <BulbImage isOn={isOn} />
         </div>
         <p className="font-extrabold text-4xl max-md:text-2xl">
           {progress < 100 ? '집중력 깜빡이는 중...' : '완료!'}
