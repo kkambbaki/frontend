@@ -1,9 +1,9 @@
 'use client';
 
 import RegisteratonBody from '@/components/onBoarding/RegisteratonBody';
-import RegisteratonHeader from '@/components/onBoarding/RegisteratonHeader';
 import PasswordBody from '@/components/onBoarding/PasswordBody';
 import React, { useState } from 'react';
+import Header from '@/components/common/Header';
 
 type Step = 'registration' | 'password';
 
@@ -12,7 +12,7 @@ const OnBoarding = () => {
 
   return (
     <div className="flex flex-col items-center">
-      <RegisteratonHeader />
+      <Header topBgColor={true} />
       {step === 'registration' ? (
         <RegisteratonBody onNext={() => setStep('password')} />
       ) : (
