@@ -19,7 +19,7 @@ const RegistrationModal: React.FC<RegistrationModalProps> = ({ isOpen, onClose, 
       className="fixed inset-0 z-50 flex items-center justify-center"
       style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
     >
-      <div className="relative">
+      <div className="relative mx-5">
         <Image
           src={registrationModalImage}
           alt="registration modal"
@@ -32,7 +32,7 @@ const RegistrationModal: React.FC<RegistrationModalProps> = ({ isOpen, onClose, 
             확인
           </PrimaryButton>
         </div>
-      </div>
+      </div> 
     </div>
   );
 };

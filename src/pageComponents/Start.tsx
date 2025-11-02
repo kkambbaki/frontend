@@ -1,11 +1,11 @@
-import RegisteratonHeader from '@/components/onBoarding/RegisteratonHeader'
+import Header from '@/components/common/Header'
 import StartBody from '@/components/onBoarding/StartBody'
 import React from 'react'
 
 const Start = () => {
   return (
     <div>
-      <RegisteratonHeader />
+      <Header topBgColor={true} />
       <StartBody />
     </div>
   )

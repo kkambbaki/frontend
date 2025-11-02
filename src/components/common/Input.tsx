@@ -86,6 +86,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             <input
               ref={ref}
               {...props}
+              type="text"
               inputMode="numeric"
               pattern="[0-9]*"
               onChange={(e) => {

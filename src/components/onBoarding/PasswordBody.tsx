@@ -33,8 +33,7 @@ const PasswordBody = () => {
         <div className="flex justify-center mb-[54px]">
           <Input
             label="비밀번호 4자리 이상"
-            variant="default"
-            className="w-[426px]"
+            variant="password"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
