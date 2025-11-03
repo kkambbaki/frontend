@@ -1,13 +1,31 @@
 @import 'tailwindcss';
 
+/* .scroll-bar {
+  scrollbar-width: thin;
+  scrollbar-color: #f2b637 transparent;
+} */
+
+.scroll-bar::-webkit-scrollbar {
+  width: 14px;
+  background: transparent;
+}
+
+.scroll-bar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scroll-bar::-webkit-scrollbar-thumb {
+  background: #f2b637;
+  border: 4px solid #9d5c15;
+  border-radius: 20px;
+}
+
 @layer base {
   /* 모든 요소 기본 설정 */
   * {
     @apply box-border;
     padding: 0;
     margin: 0;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(0, 0, 0, 0.4) transparent;
   }
 
   /* HTML 스크롤 부드럽게 */
@@ -71,6 +89,16 @@
   --color-progress-bar-left: #ffab35;
   --color-progress-bar-right: #f48c2a;
   --color-progress-bar-text: #a28565;
+  --color-modal-bg: #f2b637;
+  --color-modal-border: #9d5c15;
+  --color-modal-glow: #faca67;
+  --color-modal-inner-top-bg: #fff5e3;
+  --color-modal-inner-bottom-bg: #ffeed1;
+  --color-modal-inner-glow: #f6e0b6;
+  --color-modal-inner-border: #ad6926;
+  --color-modal-inner-text: #98816b;
+  --color-modal-title-text-border: #5b3715;
+  --color-modal-inner-input-border: #efd8ad;
 }
 
 @theme {
@@ -92,6 +120,7 @@
 }
 
 @layer utilities {
+  /* 🔸 버튼 곡선 */
   .clip-button-curve {
     clip-path: var(--clip-button-curve);
   }
