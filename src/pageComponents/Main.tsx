@@ -15,6 +15,9 @@ const Main = () => {
   const [isEffectModalOpen, setIsEffectModalOpen] = useState(false);
   const [isFirst] = useState(false); // TODO: 게임 플레이 여부 수정 필요
 
+  const closePwModal = () => setIsPwModalOpen(false);
+  const closeEffectModal = () => setIsEffectModalOpen(false);
+
   return (
     <div className="flex flex-col min-h-[calc(100vh-40px)]">
       <Logo className="absolute top-14 left-8" />
@@ -64,16 +67,7 @@ const Main = () => {
 
       {isPwModalOpen &&
         (isFirst ? (
-          <Modal
-            type="confirm"
-            isCloseBtn={true}
-            onConfirm={() => {
-              setIsPwModalOpen(false);
-            }}
-            onClose={() => {
-              setIsPwModalOpen(false);
-            }}
-          >
+          <Modal type="confirm" isCloseBtn={true} onConfirm={closePwModal} onClose={closePwModal}>
             <div className="flex items-center justify-center h-full">
               <p className="font-malrang text-5xl text-center">
                 각 게임을 1번 이상 플레이 해주세요!
@@ -81,16 +75,7 @@ const Main = () => {
             </div>
           </Modal>
         ) : (
-          <Modal
-            type="confirm"
-            isCloseBtn={true}
-            onConfirm={() => {
-              setIsPwModalOpen(false);
-            }}
-            onClose={() => {
-              setIsPwModalOpen(false);
-            }}
-          >
+          <Modal type="confirm" isCloseBtn={true} onConfirm={closePwModal} onClose={closePwModal}>
             <div className="flex flex-col items-center justify-center gap-5 h-[250px]">
               <p className="font-malrang text-5xl">비밀번호를 입력해주세요.</p>
               <p className="text-2xl font-extrabold text-modal-inner-text">
@@ -110,12 +95,8 @@ const Main = () => {
           size="large"
           type="confirm"
           isCloseBtn={true}
-          onConfirm={() => {
-            setIsEffectModalOpen(false);
-          }}
-          onClose={() => {
-            setIsEffectModalOpen(false);
-          }}
+          onConfirm={closeEffectModal}
+          onClose={closeEffectModal}
         >
           <div className="flex flex-col items-start gap-5 h-[350px] overflow-y-auto scroll-bar">
             <div className="flex flex-col gap-5">
