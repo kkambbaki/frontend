@@ -1,12 +1,10 @@
+'use client';
 import BaseButton from '@/components/common/BaseButton';
 import BulbImage from '@/components/images/BulbImage';
-import Image from 'next/image';
 
 export default function Home() {
   return (
     <main className="h-screen flex flex-col">
-      <header className="h-10 w-full bg-background-header" />
-
       <div className="flex flex-col items-center justify-center flex-1 gap-[117px]">
         <div className="flex flex-col items-center">
           <div className="flex flex-col-reverse items-center md:gap-6 md:flex-row md:justify-center">
