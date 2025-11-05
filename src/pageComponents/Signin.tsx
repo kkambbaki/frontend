@@ -1,6 +1,6 @@
-import Header from '@/components/common/Header'
-import SigninBody from '@/components/signin/SigninBody'
-import React from 'react'
+import Header from '@/components/common/Header';
+import SigninBody from '@/components/signin/SigninBody';
+import React from 'react';
 
 const Signin = () => {
   return (
@@ -8,7 +8,7 @@ const Signin = () => {
       <Header topBgColor={false} />
       <SigninBody />
     </div>
-  )
-}
+  );
+};
 
-export default Signin
+export default Signin;

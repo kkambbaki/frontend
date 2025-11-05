@@ -15,9 +15,12 @@ const Main = () => {
   const [isEffectModalOpen, setIsEffectModalOpen] = useState(false);
   const [isFirst] = useState(false); // TODO: 게임 플레이 여부 수정 필요
 
+  const closePwModal = () => setIsPwModalOpen(false);
+  const closeEffectModal = () => setIsEffectModalOpen(false);
+
   return (
     <div className="flex flex-col min-h-[calc(100vh-40px)]">
-      <Logo />
+      <Logo className="absolute top-14 left-8" />
       <div className="flex-grow px-20 pt-10 items-center flex gap-20 justify-center max-md:flex-col max-md:pt-32 max-md:pb-10 max-md:gap-10">
         <div className="flex flex-col items-center gap-5">
           <Image
@@ -42,14 +45,14 @@ const Main = () => {
       </div>
       <footer className="relative h-[108px] w-full bg-background-header flex justify-end items-center px-5 md:px-10">
         <div className="max-md:hidden">
-          <div className="absolute bg-[#FFCF74] w-[200px] h-1.5 rounded-full bottom-20 left-0"></div>
-          <div className="absolute bg-[#FFCF74] w-[140px] h-1.5 rounded-full bottom-16 left-10"></div>
-          <div className="absolute bg-[#FFCF74] w-[250px] h-1.5 rounded-full bottom-2 left-50"></div>
-          <div className="absolute bg-[#FFCF74] w-[205px] h-1.5 rounded-full bottom-10 left-120"></div>
-          <div className="absolute bg-[#FFCF74] w-[120px] h-1.5 rounded-full bottom-14 left-120"></div>
-          <div className="absolute bg-[#FFCF74] w-[100px] h-1.5 rounded-full bottom-3 right-0"></div>
-          <div className="absolute bg-[#FFCF74] w-[200px] h-1.5 rounded-full bottom-6 right-0"></div>
-          <div className="absolute bg-[#FFCF74] w-[200px] h-1.5 rounded-full bottom-20 right-10"></div>
+          <div className="absolute bg-main-footer-glow w-[200px] h-1.5 rounded-full bottom-20 left-0"></div>
+          <div className="absolute bg-main-footer-glow w-[140px] h-1.5 rounded-full bottom-16 left-10"></div>
+          <div className="absolute bg-main-footer-glow w-[250px] h-1.5 rounded-full bottom-2 left-50"></div>
+          <div className="absolute bg-main-footer-glow w-[205px] h-1.5 rounded-full bottom-10 left-120"></div>
+          <div className="absolute bg-main-footer-glow w-[120px] h-1.5 rounded-full bottom-14 left-120"></div>
+          <div className="absolute bg-main-footer-glow w-[100px] h-1.5 rounded-full bottom-3 right-0"></div>
+          <div className="absolute bg-main-footer-glow w-[200px] h-1.5 rounded-full bottom-6 right-0"></div>
+          <div className="absolute bg-main-footer-glow w-[200px] h-1.5 rounded-full bottom-20 right-10"></div>
         </div>
 
         <div className="flex gap-5">
@@ -64,16 +67,7 @@ const Main = () => {
 
       {isPwModalOpen &&
         (isFirst ? (
-          <Modal
-            type="confirm"
-            isCloseBtn={true}
-            onConfirm={() => {
-              setIsPwModalOpen(false);
-            }}
-            onClose={() => {
-              setIsPwModalOpen(false);
-            }}
-          >
+          <Modal type="confirm" isCloseBtn={true} onConfirm={closePwModal} onClose={closePwModal}>
             <div className="flex items-center justify-center h-full">
               <p className="font-malrang text-5xl text-center">
                 각 게임을 1번 이상 플레이 해주세요!
@@ -81,16 +75,7 @@ const Main = () => {
             </div>
           </Modal>
         ) : (
-          <Modal
-            type="confirm"
-            isCloseBtn={true}
-            onConfirm={() => {
-              setIsPwModalOpen(false);
-            }}
-            onClose={() => {
-              setIsPwModalOpen(false);
-            }}
-          >
+          <Modal type="confirm" isCloseBtn={true} onConfirm={closePwModal} onClose={closePwModal}>
             <div className="flex flex-col items-center justify-center gap-5 h-[250px]">
               <p className="font-malrang text-5xl">비밀번호를 입력해주세요.</p>
               <p className="text-2xl font-extrabold text-modal-inner-text">
@@ -110,12 +95,8 @@ const Main = () => {
           size="large"
           type="confirm"
           isCloseBtn={true}
-          onConfirm={() => {
-            setIsEffectModalOpen(false);
-          }}
-          onClose={() => {
-            setIsEffectModalOpen(false);
-          }}
+          onConfirm={closeEffectModal}
+          onClose={closeEffectModal}
         >
           <div className="flex flex-col items-start gap-5 h-[350px] overflow-y-auto scroll-bar">
             <div className="flex flex-col gap-5">
