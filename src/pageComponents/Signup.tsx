@@ -1,6 +1,6 @@
-import Header from '@/components/common/Header'
-import SignupBody from '@/components/signup/SignupBody'
-import React from 'react'
+import Header from '@/components/common/Header';
+import SignupBody from '@/components/signup/SignupBody';
+import React from 'react';
 
 const Signup = () => {
   return (
@@ -8,7 +8,7 @@ const Signup = () => {
       <Header topBgColor={false} />
       <SignupBody />
     </div>
-  )
-}
+  );
+};
 
-export default Signup
+export default Signup;

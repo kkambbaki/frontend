@@ -1,6 +1,6 @@
-import Header from '@/components/common/Header'
-import StartBody from '@/components/onBoarding/StartBody'
-import React from 'react'
+import Header from '@/components/common/Header';
+import StartBody from '@/components/onBoarding/StartBody';
+import React from 'react';
 
 const Start = () => {
   return (
@@ -8,7 +8,7 @@ const Start = () => {
       <Header topBgColor={true} />
       <StartBody />
     </div>
-  )
-}
+  );
+};
 
-export default Start
+export default Start;

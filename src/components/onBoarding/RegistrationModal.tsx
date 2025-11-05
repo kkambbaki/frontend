@@ -32,7 +32,7 @@ const RegistrationModal: React.FC<RegistrationModalProps> = ({ isOpen, onClose, 
             확인
           </PrimaryButton>
         </div>
-      </div> 
+      </div>
     </div>
   );
 };
