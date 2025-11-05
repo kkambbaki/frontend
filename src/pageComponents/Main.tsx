@@ -17,7 +17,7 @@ const Main = () => {
 
   return (
     <div className="flex flex-col min-h-[calc(100vh-40px)]">
-      <Logo />
+      <Logo className="absolute top-14 left-8" />
       <div className="flex-grow px-20 pt-10 items-center flex gap-20 justify-center max-md:flex-col max-md:pt-32 max-md:pb-10 max-md:gap-10">
         <div className="flex flex-col items-center gap-5">
           <Image
