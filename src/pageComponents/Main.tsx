@@ -42,14 +42,14 @@ const Main = () => {
       </div>
       <footer className="relative h-[108px] w-full bg-background-header flex justify-end items-center px-5 md:px-10">
         <div className="max-md:hidden">
-          <div className="absolute bg-[#FFCF74] w-[200px] h-1.5 rounded-full bottom-20 left-0"></div>
-          <div className="absolute bg-[#FFCF74] w-[140px] h-1.5 rounded-full bottom-16 left-10"></div>
-          <div className="absolute bg-[#FFCF74] w-[250px] h-1.5 rounded-full bottom-2 left-50"></div>
-          <div className="absolute bg-[#FFCF74] w-[205px] h-1.5 rounded-full bottom-10 left-120"></div>
-          <div className="absolute bg-[#FFCF74] w-[120px] h-1.5 rounded-full bottom-14 left-120"></div>
-          <div className="absolute bg-[#FFCF74] w-[100px] h-1.5 rounded-full bottom-3 right-0"></div>
-          <div className="absolute bg-[#FFCF74] w-[200px] h-1.5 rounded-full bottom-6 right-0"></div>
-          <div className="absolute bg-[#FFCF74] w-[200px] h-1.5 rounded-full bottom-20 right-10"></div>
+          <div className="absolute bg-main-footer-glow w-[200px] h-1.5 rounded-full bottom-20 left-0"></div>
+          <div className="absolute bg-main-footer-glow w-[140px] h-1.5 rounded-full bottom-16 left-10"></div>
+          <div className="absolute bg-main-footer-glow w-[250px] h-1.5 rounded-full bottom-2 left-50"></div>
+          <div className="absolute bg-main-footer-glow w-[205px] h-1.5 rounded-full bottom-10 left-120"></div>
+          <div className="absolute bg-main-footer-glow w-[120px] h-1.5 rounded-full bottom-14 left-120"></div>
+          <div className="absolute bg-main-footer-glow w-[100px] h-1.5 rounded-full bottom-3 right-0"></div>
+          <div className="absolute bg-main-footer-glow w-[200px] h-1.5 rounded-full bottom-6 right-0"></div>
+          <div className="absolute bg-main-footer-glow w-[200px] h-1.5 rounded-full bottom-20 right-10"></div>
         </div>
 
         <div className="flex gap-5">
