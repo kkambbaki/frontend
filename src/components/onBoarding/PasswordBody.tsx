@@ -3,8 +3,8 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import PrimaryButton from '../common/PrimaryButton';
-import RegistrationModal from './RegistrationModal';
 import { Input } from '../common/Input';
+import Modal from '../common/Modal';
 
 const PasswordBody = () => {
   const router = useRouter();
@@ -50,11 +50,13 @@ const PasswordBody = () => {
           </PrimaryButton>
         </div>
       </div>
-      <RegistrationModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onConfirm={handleModalConfirm}
-      />
+      {isModalOpen && (
+        <Modal type="confirm" onConfirm={handleModalConfirm}>
+          <div className="flex h-full items-center justify-center">
+            <p className="font-malrang text-5xl text-[#68482A]">아이 등록이 완료되었습니다.</p>
+          </div>
+        </Modal>
+      )}
     </>
   );
 };
