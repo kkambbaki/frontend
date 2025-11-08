@@ -27,7 +27,7 @@ const Description = ({
 
       <div className="absolute top-1 left-1/2 -translate-x-1/2 bg-[#F9CC7E] w-[426px] h-[5px] rounded-full"></div>
       <div className="relative bg-[#F8E29B] pl-[63px] pr-[84px] pt-[58px] pb-[52px] rounded-[24px] border-[6.5px] border-[#99622D]">
-        <p className="w-[781px] whitespace-nowrap font-nanum text-[30px] font-black text-[#443A26]">
+        <p className="w-[781px] no-wrap font-nanum text-[30px] font-black text-[#443A26]">
           {children}
         </p>
         <button onClick={onClickNext}>
