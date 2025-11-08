@@ -2,7 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import nextImage from '@/assets/icons/next.svg';
 
-const Description = ({ children, title }: { children: React.ReactNode; title: string }) => {
+const Description = ({ children, title, onClickNext }: { children: React.ReactNode; title: string; onClickNext: () => void }) => {
   return (
     <div className="relative bg-[#EFB141] rounded-[36px] border-[6.5px] border-[#99622D] p-4">
       {/* 제목 */}
@@ -20,7 +20,7 @@ const Description = ({ children, title }: { children: React.ReactNode; title: st
         <p className="w-[781px] no-wrap font-nanum text-[30px] font-black text-[#443A26]">
           {children}
         </p>
-        <button>
+        <button onClick={onClickNext}>
           <Image
             src={nextImage}
             alt="next"
