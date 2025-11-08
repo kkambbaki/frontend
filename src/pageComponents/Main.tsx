@@ -9,6 +9,7 @@ import PrimaryButton from '@/components/common/PrimaryButton';
 import Modal from '@/components/common/Modal';
 import ModalTitle from '@/components/common/ModalTitle';
 import { Input } from '@/components/common/Input';
+import SecondaryButton from '@/components/common/SecondaryButton';
 
 const Main = () => {
   const [isPwModalOpen, setIsPwModalOpen] = useState(false);
@@ -55,13 +56,23 @@ const Main = () => {
           <div className="absolute bg-main-footer-glow w-[200px] h-1.5 rounded-full bottom-20 right-10"></div>
         </div>
 
-        <div className="flex gap-5">
-          <PrimaryButton onClick={() => setIsPwModalOpen(true)} variant="sm">
+        <div className="flex gap-3">
+          <SecondaryButton
+            variant="focusResult"
+            onClick={() => {
+              setIsPwModalOpen(true);
+            }}
+          >
             집중력 학습 결과
-          </PrimaryButton>
-          <PrimaryButton onClick={() => setIsEffectModalOpen(true)} variant="sm">
+          </SecondaryButton>
+          <SecondaryButton
+            variant="learningEffect"
+            onClick={() => {
+              setIsEffectModalOpen(true);
+            }}
+          >
             교육적 효과
-          </PrimaryButton>
+          </SecondaryButton>
         </div>
       </footer>
 
