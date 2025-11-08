@@ -50,6 +50,10 @@
     border: none;
     background: none;
   }
+
+  .font-nanum {
+    font-family: 'NanumSquareRoundExtraBold', 'NanumSquareRound', sans-serif;
+  }
 }
 
 /* ✅ GeekbleMalrangiche */
@@ -63,10 +67,10 @@
 
 /* ✅ NanumSquareRound */
 @font-face {
-  font-family: 'NanumSquareRound';
-  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_two@1.0/NanumSquareRound.woff')
-    format('woff');
-  font-weight: normal;
+  font-family: 'NanumSquareRoundExtraBold';
+  src: url('../assets/fonts/NanumSquareRoundOTFEB.otf') format('opentype');
+  font-weight: 800;
+  font-style: normal;
   font-display: swap;
 }
 
@@ -104,7 +108,7 @@
 
 @theme {
   --font-malrang: 'GeekbleMalrangiche', sans-serif;
-  --font-nanum: 'NanumSquareRound', sans-serif;
+  --font-nanum: 'NanumSquareRoundExtraBold', sans-serif;
   --clip-button-curve: polygon(
     0 0,
     100% 0,
