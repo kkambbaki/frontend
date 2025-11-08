@@ -1,8 +1,18 @@
+'use client';
+
 import React from 'react';
 import Image from 'next/image';
 import nextImage from '@/assets/icons/next.svg';
 
-const Description = ({ children, title, onClickNext }: { children: React.ReactNode; title: string; onClickNext: () => void }) => {
+const Description = ({
+  children,
+  title,
+  onClickNext,
+}: {
+  children: React.ReactNode;
+  title: string;
+  onClickNext: () => void;
+}) => {
   return (
     <div className="relative bg-[#EFB141] rounded-[36px] border-[6.5px] border-[#99622D] p-4">
       {/* 제목 */}
