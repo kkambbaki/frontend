@@ -10,6 +10,7 @@ import Modal from '@/components/common/Modal';
 import ModalTitle from '@/components/common/ModalTitle';
 import { Input } from '@/components/common/Input';
 import SecondaryButton from '@/components/common/SecondaryButton';
+import { useRouter } from 'next/navigation';
 
 const Main = () => {
   const [isPwModalOpen, setIsPwModalOpen] = useState(false);
@@ -18,6 +19,8 @@ const Main = () => {
 
   const closePwModal = () => setIsPwModalOpen(false);
   const closeEffectModal = () => setIsEffectModalOpen(false);
+
+  const router = useRouter();
 
   return (
     <div className="flex flex-col min-h-[calc(100vh-40px)]">
@@ -31,7 +34,7 @@ const Main = () => {
             height={340}
             className="border-[18px] border-background-header rounded-[75px] hover:scale-105 transition-transform"
           />
-          <PrimaryButton onClick={() => console.log('clicked')}>시작하기</PrimaryButton>
+          <PrimaryButton onClick={() => router.push('/game/star')}>시작하기</PrimaryButton>
         </div>
         <div className="flex flex-col items-center gap-5">
           <Image
@@ -41,7 +44,7 @@ const Main = () => {
             height={340}
             className="border-[18px] border-background-header rounded-[75px] hover:scale-105 transition-transform"
           />
-          <PrimaryButton onClick={() => console.log('clicked')}>시작하기</PrimaryButton>
+          <PrimaryButton onClick={() => router.push('/game/traffic')}>시작하기</PrimaryButton>
         </div>
       </div>
       <footer className="relative h-[108px] w-full bg-background-header flex justify-end items-center px-5 md:px-10">
