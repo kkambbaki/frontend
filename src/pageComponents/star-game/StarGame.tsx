@@ -49,7 +49,7 @@ const StarGame = () => {
             if (state < descriptions.length - 1) {
               setState(state + 1);
             } else {
-              router.push('/game/star/round1');
+              router.push('/game/star/round');
             }
           }}
         >
