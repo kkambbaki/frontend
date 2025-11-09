@@ -26,13 +26,13 @@ const Description = ({
       </div>
 
       <div className="absolute top-1 left-1/2 -translate-x-1/2 bg-[#F9CC7E] w-[426px] h-[5px] rounded-full"></div>
-      <div className="relative bg-[#F8E29B] pl-[63px] pr-[84px] pt-[58px] pb-[52px] rounded-[24px] border-[6.5px] border-[#99622D]">
-        <p className="no-wrap font-nanum text-[30px] font-black text-[#443A26]">{children}</p>
-        <button onClick={onClickNext}>
+      <div className="relative no-wrap bg-[#F8E29B] pl-[63px] pr-[84px] pt-[58px] pb-[52px] rounded-[24px] border-[6.5px] border-[#99622D]">
+        <p className="no-wrap w-[782px] font-nanum text-[30px] font-black text-[#443A26]">{children}</p>
+        <button type="button" onClick={onClickNext}>
           <Image
             src={nextImage}
-            alt="next"
-            className="absolute bottom-[33px] right-[56px] hover:scale-105 transition-transform"
+            alt="다음"
+            className="absolute bottom-[33px] right-[56px] transition-transform hover:scale-105 active:scale-95"
             width={60}
             height={60}
           />
