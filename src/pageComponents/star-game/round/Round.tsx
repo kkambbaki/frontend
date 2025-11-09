@@ -9,13 +9,17 @@ import star from '@/assets/images/star.png';
 import ProgressBar from '@/app/loading/components/ProgressBar';
 import { motion, AnimatePresence } from 'framer-motion';
 import fingerImage from '@/assets/images/finger.png';
-import GameBoard, { GameStats } from '@/app/game/star/round/components/GameBoard';
+import GameBoard, { GameStats } from '@/pageComponents/star-game/round/components/GameBoard';
+import ScoreBoard from '@/components/common/ScoreBoard';
 
 const Round = () => {
-  const [overlayStep, setOverlayStep] = useState(0); // 0=ROUND, 1=준비, 2=시작, 3=터치, 4=게임, 5=CLEAR, 6=GAMEOVER
+  const [overlayStep, setOverlayStep] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
   const [round, setRound] = useState(1);
   const [score, setScore] = useState(0);
+
+  // 결과 모달 상태
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // 타이머 관련
   const [progress, setProgress] = useState(100);
@@ -53,7 +57,7 @@ const Round = () => {
     return () => clearInterval(interval);
   }, [timerRunning, timeLeft]);
 
-  // 라운드 오버레이 순서 (ROUND → 준비 → 시작 → 터치)
+  // 라운드 시작 오버레이 순서
   useEffect(() => {
     setOverlayStep(0);
     setGameStarted(false);
@@ -69,26 +73,25 @@ const Round = () => {
     return () => timers.forEach(clearTimeout);
   }, [round]);
 
-  // 게임 시작
+  // 인지 단계 클릭
   const handleOverlayClick = () => {
     if (overlayStep === 3) {
       setOverlayStep(4);
-
       setTimeout(() => {
         setGameStarted(true);
       }, 800);
     }
   };
 
-  // 시간 초과 → 게임 오버
+  // ✅ 시간 초과 시 모달 오픈
   const handleTimeOver = () => {
     setTimerRunning(false);
     setGameStarted(false);
-    setOverlayStep(6); // “GAME OVER”
+    setIsModalOpen(true);
   };
 
-  // 다시 시작
   const handleRestart = () => {
+    setIsModalOpen(false);
     setScore(0);
     setRound(1);
     setOverlayStep(0);
@@ -100,11 +103,9 @@ const Round = () => {
       setTimeout(() => setOverlayStep(2), 3000),
       setTimeout(() => setOverlayStep(3), 4500),
     ];
-
     return () => timers.forEach(clearTimeout);
   };
 
-  // 오버레이 텍스트
   const overlayText =
     overlayStep === 0
       ? `${round} ROUND`
@@ -114,17 +115,25 @@ const Round = () => {
           ? '시작!'
           : overlayStep === 5
             ? 'ROUND CLEAR!'
-            : overlayStep === 6
-              ? 'GAME OVER'
-              : '';
+            : '';
 
-  const overlayColor = overlayStep === 6 ? '#FF4D4D' : overlayStep === 5 ? '#FFD23C' : '#F6A000';
+  const overlayColor = overlayStep === 5 ? '#FFD23C' : '#F6A000';
 
   return (
     <div className="w-full h-screen relative overflow-hidden">
-      {/* 오버레이 */}
+      {isModalOpen && (
+        <div className="absolute inset-0 flex items-center justify-center z-[200] bg-black/60">
+          <ScoreBoard
+            type="star"
+            score={score}
+            onClose={() => setIsModalOpen(false)}
+            onRetry={handleRestart}
+          />
+        </div>
+      )}
+
       <AnimatePresence>
-        {overlayStep !== 4 && (
+        {overlayStep !== 4 && !isModalOpen && (
           <motion.div
             key={overlayStep}
             initial={{ opacity: 0 }}
@@ -133,8 +142,8 @@ const Round = () => {
             transition={{ duration: 0.8 }}
             className="absolute inset-0 flex flex-col items-center justify-center font-malrang z-[90] bg-black/60"
           >
-            {/* 기본 텍스트 */}
-            {[0, 1, 2, 5, 6].includes(overlayStep) && (
+            {/* ROUND~CLEAR 텍스트 */}
+            {[0, 1, 2, 5].includes(overlayStep) && (
               <motion.p
                 key={overlayText}
                 initial={{ scale: 0.7, opacity: 0 }}
@@ -152,7 +161,7 @@ const Round = () => {
               </motion.p>
             )}
 
-            {/* 터치 안내 단계 */}
+            {/* 인지단계 안내 (손가락 + 텍스트 유지) */}
             {overlayStep === 3 && (
               <div className="absolute left-1/2 -translate-x-1/2 top-7 z-[50]">
                 <div className="flex flex-col items-center gap-3">
@@ -160,7 +169,6 @@ const Round = () => {
                     {round}라운드: 인지단계
                   </p>
 
-                  {/* Progress Bar */}
                   <div className="relative w-[600px] h-[100px] opacity-0">
                     <Image
                       src={starGameProgressBarImage}
@@ -173,7 +181,7 @@ const Round = () => {
                     </div>
                   </div>
 
-                  {/* 손가락 이미지 */}
+                  {/* 손가락 애니메이션 */}
                   <div className="flex flex-col items-center pointer-events-none absolute z-50 -right-10 bottom-20">
                     <Image
                       src={fingerImage}
@@ -201,47 +209,6 @@ const Round = () => {
                   </p>
                 </div>
               </div>
-            )}
-
-            {/* 게임오버 모달 */}
-            {overlayStep === 6 && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8 }}
-                className="flex flex-col items-center gap-6 mt-10"
-              >
-                <p className="text-[#FFECEC] text-4xl font-bold font-nanum">
-                  당신의 점수: <span className="text-[#FFB923]">{score}</span> 점
-                </p>
-                <button
-                  onClick={handleRestart}
-                  className="bg-[#FFB923] text-[#452100] text-3xl font-malrang px-12 py-4 rounded-2xl hover:scale-105 transition-all"
-                >
-                  다시 시작하기
-                </button>
-              </motion.div>
-            )}
-
-            {overlayStep === 7 && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8 }}
-                className="flex flex-col items-center gap-6 mt-10"
-              >
-                <p className="text-[#FFECEC] text-5xl font-bold font-nanum">🎉 GAME CLEAR!</p>
-                <p className="text-[#FFECEC] text-3xl font-bold font-nanum">
-                  총 점수: <span className="text-[#FFB923]">{score}</span> 점
-                </p>
-
-                <button
-                  onClick={handleRestart}
-                  className="bg-[#FFB923] text-[#452100] text-3xl font-malrang px-12 py-4 rounded-2xl hover:scale-105 transition-all"
-                >
-                  다시 하기
-                </button>
-              </motion.div>
             )}
           </motion.div>
         )}
@@ -275,7 +242,6 @@ const Round = () => {
         <div className="flex flex-col items-center gap-3">
           <p className="font-malrang text-[40px] text-[#FAFAFA]">{round}라운드: 인지단계</p>
 
-          {/* Progress Bar */}
           <div className="relative w-[600px] h-[100px]">
             <Image src={starGameProgressBarImage} alt="progress-bar" width={650} className="z-0" />
             <div className="absolute inset-0 left-[90px] top-10">
@@ -285,17 +251,12 @@ const Round = () => {
 
           {/* Game Board */}
           <div className="relative w-[616px] h-[450px] rounded-3xl bg-black/10 flex items-center justify-center p-5 z-[50]">
-            <div className="w-full h-full rounded-3xl bg-white/10 flex items-center justify-center p-5">
-              <div className="w-full h-full bg-[#2D3165]/70 rounded-3xl blur-sm"></div>
-            </div>
-
             {gameStarted && (
               <GameBoard
                 key={round}
                 round={round}
                 setScore={setScore}
                 onMemoryEnd={() => {
-                  // 인지단계가 끝난 후 → 타이머 시작
                   const newTime = Math.max(5, 12.5 - round * 0.5);
                   setTimeLeft(newTime);
                   setProgress(100);
@@ -303,10 +264,9 @@ const Round = () => {
                 }}
                 onRoundComplete={(stats) => {
                   setTimerRunning(false);
-                  setOverlayStep(5);
                   setGameStarted(false);
+                  setOverlayStep(5);
 
-                  // 통계 합산 (라운드별 누적)
                   setTotalStats((prev) => ({
                     totalClicks: prev.totalClicks + stats.totalClicks,
                     wrongClicks: prev.wrongClicks + stats.wrongClicks,
@@ -314,29 +274,14 @@ const Round = () => {
                     successRounds: prev.successRounds + stats.successRounds,
                   }));
 
-                  console.log('라운드 통계:', stats);
-                  console.log('현재까지 누적 통계:', {
-                    totalClicks: totalStats.totalClicks + stats.totalClicks,
-                    wrongClicks: totalStats.wrongClicks + stats.wrongClicks,
-                    correctClicks: totalStats.correctClicks + stats.correctClicks,
-                    successRounds: totalStats.successRounds + stats.successRounds,
-                  });
-
-                  // 마지막 라운드면 게임 클리어 처리
+                  // 게임 클리어 시 모달 오픈
                   if (round >= 10) {
                     setTimeout(() => {
-                      setOverlayStep(7); // “GAME CLEAR”
-                      console.log('🎉 전체 게임 누적 통계:', {
-                        totalClicks: totalStats.totalClicks + stats.totalClicks,
-                        wrongClicks: totalStats.wrongClicks + stats.wrongClicks,
-                        correctClicks: totalStats.correctClicks + stats.correctClicks,
-                        successRounds: totalStats.successRounds + stats.successRounds,
-                      });
-                    }, 2000);
+                      setIsModalOpen(true);
+                    }, 1500);
                     return;
                   }
 
-                  // 다음 라운드로 이동
                   setTimeout(() => {
                     setRound((r) => r + 1);
                   }, 2000);
@@ -344,10 +289,6 @@ const Round = () => {
               />
             )}
           </div>
-
-          <p className="text-[36px] text-[#F3ECCF] mt-2 font-extrabold z-[50] relative whitespace-nowrap">
-            아기별이 등장하는 위치와 순서를 기억해봐!
-          </p>
         </div>
       </div>
 

@@ -1,5 +1,6 @@
 'use client';
 import BaseButton from '@/components/common/BaseButton';
+import ScoreBoard from '@/components/common/ScoreBoard';
 import BulbImage from '@/components/images/BulbImage';
 
 export default function Home() {
