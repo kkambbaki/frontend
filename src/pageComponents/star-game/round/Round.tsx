@@ -11,8 +11,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import fingerImage from '@/assets/images/finger.png';
 import GameBoard, { GameStats } from '@/pageComponents/star-game/round/components/GameBoard';
 import ScoreBoard from '@/components/common/ScoreBoard';
+import { useRouter } from 'next/navigation';
 
 const Round = () => {
+  const router = useRouter();
+
   const [overlayStep, setOverlayStep] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
   const [round, setRound] = useState(1);
@@ -83,7 +86,7 @@ const Round = () => {
     }
   };
 
-  // ✅ 시간 초과 시 모달 오픈
+  // 시간 초과 시 모달 오픈
   const handleTimeOver = () => {
     setTimerRunning(false);
     setGameStarted(false);
@@ -126,7 +129,7 @@ const Round = () => {
           <ScoreBoard
             type="star"
             score={score}
-            onClose={() => setIsModalOpen(false)}
+            onClose={() => router.push('/main')}
             onRetry={handleRestart}
           />
         </div>
