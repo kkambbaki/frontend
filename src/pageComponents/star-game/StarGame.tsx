@@ -6,6 +6,7 @@ import starGameBackgroundImage from '@/assets/images/star-game-backgroundimage.p
 import starGameCharacter from '@/assets/images/star-game-character.png';
 import Description from '@/components/trafficGame/Description';
 import backButton from '@/assets/icons/back.svg';
+import { useRouter } from 'next/navigation';
 
 const StarGame = () => {
   const [state, setState] = useState(0); // description state
@@ -14,6 +15,7 @@ const StarGame = () => {
     '별들이 깜빡이는 위치를 기억해서 순서대로 입력하면 별들이 제자리를 찾아가 별자리가 될 수 있어.',
     '나와 함께 우주탐험대가 되어 작은 별들을 구출해 주겠니?',
   ];
+  const router = useRouter();
 
   return (
     <div className="w-full h-screen">
@@ -46,6 +48,8 @@ const StarGame = () => {
           onClickNext={() => {
             if (state < descriptions.length - 1) {
               setState(state + 1);
+            } else {
+              router.push('/game/star/round');
             }
           }}
         >

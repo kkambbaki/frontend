@@ -1,10 +1,11 @@
 'use client';
 import BaseButton from '@/components/common/BaseButton';
+import ScoreBoard from '@/components/common/ScoreBoard';
 import BulbImage from '@/components/images/BulbImage';
 
 export default function Home() {
   return (
-    <main className="h-screen flex flex-col">
+    <main className="h-[calc(100vh-40px)] flex flex-col">
       <div className="flex flex-col items-center justify-center flex-1 gap-[117px]">
         <div className="flex flex-col items-center">
           <div className="flex flex-col-reverse items-center md:gap-6 md:flex-row md:justify-center">

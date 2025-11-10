@@ -36,7 +36,7 @@
   /* Body 기본 스타일 */
   body {
     @apply bg-[#FFFCEA] font-sans text-main-text;
-    font-family: 'NanumSquareRound', sans-serif;
+    font-family: 'NanumSquareRoundExtraBold', sans-serif;
   }
 
   /* 링크 기본 스타일 */
