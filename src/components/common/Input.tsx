@@ -11,6 +11,8 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   required?: boolean;
   error?: boolean;
   errorText?: string;
+  helperText?: string;
+  helperTextVariant?: 'default' | 'success' | 'error';
   onBirthComplete?: (isComplete: boolean) => void;
 }
 
@@ -23,6 +25,8 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
       required,
       error,
       errorText,
+      helperText,
+      helperTextVariant = 'default',
       onBirthComplete,
       ...props
     },
@@ -165,6 +169,9 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
       }
     };
 
+    const messageText = errorText ?? helperText ?? '';
+    const messageVariant = errorText ? 'error' : helperTextVariant;
+
     return (
       <div className="w-full flex flex-col gap-1 text-xl">
         {/* 입력 영역 */}
@@ -183,17 +190,18 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           {renderContent()}
         </div>
 
-        {/* 에러 텍스트 */}
-        {errorText && (
-          <p
-            className={cn(
-              'text-error-text text-sm ml-4 mt-1 leading-none',
-              variant === 'password' && 'text-center text-[20px]'
-            )}
-          >
-            {errorText}
-          </p>
-        )}
+        {/* 메시지 영역 */}
+        <p
+          className={cn(
+            'ml-4 mt-1 min-h-[20px] text-sm leading-none font-bold',
+            !messageText && 'font-medium text-transparent',
+            messageVariant === 'error' && 'text-error-text',
+            messageVariant === 'success' && 'text-[#3D7F0B]',
+            messageVariant === 'default' && !!messageText && 'text-placeholder-text'
+          )}
+        >
+          {messageText}
+        </p>
       </div>
     );
   }
