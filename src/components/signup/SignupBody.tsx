@@ -5,13 +5,13 @@ import { useRouter } from 'next/navigation';
 import { Input } from '../common/Input';
 import BaseButton from '../common/BaseButton';
 import { checkUsername } from '@/lib/api/auth/checkUsername';
-import { registerUser } from '@/lib/api/auth/register';
-
-const USERNAME_MIN_LENGTH = 4;
-const PASSWORD_MIN_LENGTH = 8;
-
-const USERNAME_VALIDATION_MESSAGE = '아이디는 영문과 숫자를 포함하여 4자리 이상이어야 해요.';
-const PASSWORD_VALIDATION_MESSAGE = '비밀번호는 영문과 숫자를 포함하여 8자리 이상이어야 해요.';
+import { signup } from '@/lib/api/auth/signup';
+import {
+  PASSWORD_MIN_LENGTH,
+  PASSWORD_VALIDATION_MESSAGE,
+  USERNAME_MIN_LENGTH,
+  USERNAME_VALIDATION_MESSAGE,
+} from '@/lib/constants/auth';
 
 const SignupBody = () => {
   const [username, setUsername] = useState('');
@@ -115,7 +115,7 @@ const SignupBody = () => {
     setIsFormError(false);
 
     try {
-      await registerUser({
+      await signup({
         username: username.trim(),
         password1: password,
         password2: password,
