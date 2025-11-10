@@ -31,8 +31,8 @@ const TrafficGame = () => {
           height={120}
           priority
         />
-        <div className="absolute bottom-[100px] left-1/2 -translate-x-1/2">
-          <Description title="신호등" onClickNext={handleNext}>
+        <div className="absolute bottom-[100px] left-1/2 w-full -translate-x-1/2 px-29">
+          <Description title="신호등" onClickNext={handleNext} className="w-full">
             {currentSentence}
           </Description>
         </div>

@@ -42,7 +42,7 @@ const StarGame = () => {
         />
       </div>
 
-      <div className="w-full px-20 absolute bottom-3">
+      <div className="w-full px-29 absolute bottom-[100px]">
         <Description
           title="별똥이"
           onClickNext={() => {
