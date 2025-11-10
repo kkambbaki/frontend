@@ -5,7 +5,7 @@ import React from 'react';
 const Signup = () => {
   return (
     <div className="flex flex-col items-center justify-center">
-      <Header topBgColor={false} />
+      <Header />
       <SignupBody />
     </div>
   );

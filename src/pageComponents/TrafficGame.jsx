@@ -5,9 +5,13 @@ import Image from 'next/image';
 import Description from '@/components/trafficGame/Description';
 import trafficBackground from '@/assets/images/traffic-background-on.png';
 import backImg from '@/assets/icons/back.svg';
+import { useRouter } from 'next/navigation';
 
 const TrafficGame = () => {
-  const { currentSentence, handleNext } = useTrafficNarration();
+  const router = useRouter();
+  const { currentSentence, handleNext } = useTrafficNarration(() =>
+    router.push('/game/traffic/round1')
+  );
 
   return (
     <div className="relative min-h-screen w-full">
@@ -46,18 +50,22 @@ const SENTENCES = [
   '나와 함께 교통 지킴이가 되어 도시의 안전을 지켜줄래?',
 ];
 
-const useTrafficNarration = () => {
+const useTrafficNarration = (onComplete) => {
   const [sentenceIndex, setSentenceIndex] = useState(0);
 
   const handleNext = useCallback(() => {
-    setSentenceIndex((prev) => (prev < SENTENCES.length - 1 ? prev + 1 : prev));
-  }, []);
+    const lastIndex = SENTENCES.length - 1;
+    if (sentenceIndex >= lastIndex) {
+      onComplete();
+      return;
+    }
+    setSentenceIndex((prev) => Math.min(prev + 1, lastIndex));
+  }, [sentenceIndex, onComplete]);
 
   const currentSentence = useMemo(() => SENTENCES[sentenceIndex], [sentenceIndex]);
 
   return {
     currentSentence,
-    sentenceIndex,
     handleNext,
   };
 };

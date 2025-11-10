@@ -34,7 +34,7 @@ const PrimaryButton: React.FC<PrimaryButtonProps> = ({
     green: {
       topColor: '#8ADC18',
       bottomColor: '#54C600',
-      borderColor: '#377030',
+      borderColor: '#0D4300',
       icon: buttonCircleIconGreen,
     },
     red: {
@@ -91,7 +91,7 @@ const PrimaryButton: React.FC<PrimaryButtonProps> = ({
     },
     lg: {
       fontSize: '53.5px',
-      borderRadius: '44px',
+      borderRadius: '50px',
       borderWidth: 9,
       contentWidth: 246,
       contentHeight: 136,

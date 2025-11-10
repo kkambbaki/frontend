@@ -51,6 +51,10 @@
     background: none;
   }
 
+  .font-malrangiche {
+    font-family: 'GeekbleMalrangiche', sans-serif;
+  }
+
   .font-nanum {
     font-family: 'NanumSquareRoundExtraBold', 'NanumSquareRound', sans-serif;
   }

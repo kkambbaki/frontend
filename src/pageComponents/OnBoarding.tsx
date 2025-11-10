@@ -12,7 +12,7 @@ const OnBoarding = () => {
 
   return (
     <div className="flex flex-col items-center">
-      <Header topBgColor={true} />
+      <Header />
       {step === 'registration' ? (
         <RegisteratonBody onNext={() => setStep('password')} />
       ) : (
