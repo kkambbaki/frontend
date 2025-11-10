@@ -5,7 +5,7 @@ import React from 'react';
 const Start = () => {
   return (
     <div>
-      <Header topBgColor={true} />
+      <Header />
       <StartBody />
     </div>
   );

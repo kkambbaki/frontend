@@ -1,5 +1,5 @@
 import React from 'react';
-import TrafficGame from '@/pageComponents/TrafficGame';
+import TrafficGame from '@/pageComponents/traffic-game/TrafficGame';
 
 const page = () => {
   return <TrafficGame />;

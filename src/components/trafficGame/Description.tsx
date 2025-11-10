@@ -3,18 +3,23 @@
 import React from 'react';
 import Image from 'next/image';
 import nextImage from '@/assets/icons/next.svg';
+import { cn } from '@/lib/utils';
 
-const Description = ({
-  children,
-  title,
-  onClickNext,
-}: {
+type DescriptionProps = {
   children: React.ReactNode;
   title: string;
   onClickNext: () => void;
-}) => {
+  className?: string;
+};
+
+const Description = ({ children, title, onClickNext, className }: DescriptionProps) => {
   return (
-    <div className="relative bg-[#EFB141] rounded-[36px] border-[6.5px] border-[#99622D] p-4">
+    <div
+      className={cn(
+        'relative bg-[#EFB141] rounded-[36px] border-[6.5px] border-[#99622D] p-4',
+        className
+      )}
+    >
       {/* 제목 */}
       <div className="absolute -top-12 left-15 z-10">
         <div className="relative bg-[#EEB041] py-[13px] px-[15px] rounded-[33px] border-[6px] border-[#99622D]">
