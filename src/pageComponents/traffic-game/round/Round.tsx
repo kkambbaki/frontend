@@ -8,9 +8,10 @@ import PrimaryButton from '@/components/common/PrimaryButton';
 import trafficBackground from '@/assets/images/traffic-background.png';
 import trafficLightRed from '@/assets/images/traffic-light-red.png';
 import trafficLightGreen from '@/assets/images/traffic-light-green.png';
-import backImg from '@/assets/icons/back.svg';
 import carImage from '@/assets/images/car.png';
 import gasGaugeImage from '@/assets/images/gas.png';
+import backImg from '@/assets/icons/back.svg';
+import ScoreBoard from '@/components/common/ScoreBoard';
 
 const ROUND_CONFIG = [
   { round: 1, changeCount: 5, interval: 4000 },
@@ -25,7 +26,11 @@ const ROUND_CONFIG = [
   { round: 10, changeCount: 5, interval: 1800 },
 ] as const;
 
-const TrafficRound1Page = () => {
+interface RoundProps {
+  onBack?: () => void;
+}
+
+const Round: React.FC<RoundProps> = ({ onBack }) => {
   const router = useRouter();
   const [roundIndex, setRoundIndex] = useState(0);
   const [overlayStep, setOverlayStep] = useState<'round' | 'ready' | 'start' | 'none'>('round');
@@ -35,9 +40,14 @@ const TrafficRound1Page = () => {
   const [buttonsDisabled, setButtonsDisabled] = useState(true);
   const [changeCount, setChangeCount] = useState(0);
   const [isCarMoving, setIsCarMoving] = useState(false);
+  const [isGameOver, setIsGameOver] = useState(false);
+  const [resetKey, setResetKey] = useState(0);
   const cycleRespondedRef = useRef(false);
 
-  const currentRound = useMemo(() => ROUND_CONFIG[roundIndex], [roundIndex]);
+  const currentRound = useMemo(
+    () => ROUND_CONFIG[Math.min(roundIndex, ROUND_CONFIG.length - 1)],
+    [roundIndex]
+  );
   const isLastRound = roundIndex >= ROUND_CONFIG.length - 1;
 
   useEffect(() => {
@@ -45,27 +55,30 @@ const TrafficRound1Page = () => {
     setOverlayStep('round');
     setButtonsDisabled(true);
     setLightState('red');
-    setIsCarMoving(true);
+    setIsCarMoving(false);
     const timers = [
       setTimeout(() => setOverlayStep('ready'), 800),
       setTimeout(() => setOverlayStep('start'), 1600),
       setTimeout(() => {
         setOverlayStep('none');
         setButtonsDisabled(false);
+        setLightState('green');
+        setIsCarMoving(false);
         cycleRespondedRef.current = false;
       }, 2400),
     ];
 
     return () => timers.forEach(clearTimeout);
-  }, [roundIndex]);
-
-  const handleBack = () => router.back();
+  }, [roundIndex, resetKey]);
 
   const registerFail = useCallback(() => {
     setFailCount((prev) => {
       const next = Math.min(prev + 1, 3);
       if (next >= 3) {
         setButtonsDisabled(true);
+        setIsGameOver(true);
+        setIsCarMoving(false);
+        setOverlayStep('none');
       }
       return next;
     });
@@ -75,6 +88,8 @@ const TrafficRound1Page = () => {
     if (isLastRound) {
       setOverlayStep('none');
       setButtonsDisabled(true);
+      setIsCarMoving(false);
+      setIsGameOver(true);
       return;
     }
     setRoundIndex((prev) => prev + 1);
@@ -87,7 +102,6 @@ const TrafficRound1Page = () => {
   const handleGreen = () => {
     if (buttonsDisabled) return;
     if (lightState !== 'green') {
-      cycleRespondedRef.current = true;
       registerFail();
       return;
     }
@@ -100,7 +114,6 @@ const TrafficRound1Page = () => {
   const handleRed = () => {
     if (buttonsDisabled) return;
     if (lightState !== 'red') {
-      cycleRespondedRef.current = true;
       registerFail();
       return;
     }
@@ -130,8 +143,22 @@ const TrafficRound1Page = () => {
     });
   }, [advanceRound, currentRound.changeCount, registerFail, lightState]);
 
+  const handleRestart = useCallback(() => {
+    setScore(0);
+    setFailCount(0);
+    setRoundIndex(0);
+    setChangeCount(0);
+    setLightState('red');
+    setButtonsDisabled(true);
+    setOverlayStep('round');
+    setIsCarMoving(true);
+    setIsGameOver(false);
+    cycleRespondedRef.current = false;
+    setResetKey((prev) => prev + 1);
+  }, []);
+
   useEffect(() => {
-    if (overlayStep !== 'none' || failCount >= 3) {
+    if (overlayStep !== 'none' || failCount >= 3 || isGameOver) {
       return;
     }
 
@@ -144,10 +171,27 @@ const TrafficRound1Page = () => {
     return () => {
       clearInterval(intervalId);
     };
-  }, [overlayStep, failCount, buttonsDisabled, currentRound.interval, handleSignalChange]);
+  }, [
+    overlayStep,
+    failCount,
+    buttonsDisabled,
+    currentRound.interval,
+    handleSignalChange,
+    isGameOver,
+  ]);
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden">
+      {isGameOver && (
+        <div className="absolute inset-0 z-[300] flex items-center justify-center bg-black/60">
+          <ScoreBoard
+            type="traffic"
+            score={score}
+            onClose={() => router.push('/main')}
+            onRetry={handleRestart}
+          />
+        </div>
+      )}
       <AnimatePresence>
         {overlayStep !== 'none' && (
           <motion.div
@@ -177,13 +221,15 @@ const TrafficRound1Page = () => {
 
       <Image src={trafficBackground} alt="교통 게임 배경" fill priority className="object-cover" />
 
-      <button
-        type="button"
-        onClick={handleBack}
-        className="absolute left-[80px] top-[50px] z-20 transition-transform hover:scale-105 active:scale-95"
-      >
-        <Image src={backImg} alt="뒤로가기" width={120} height={120} priority />
-      </button>
+      {onBack && (
+        <button
+          type="button"
+          onClick={onBack}
+          className="absolute left-[80px] top-[50px] z-20 transition-transform hover:scale-105 active:scale-95"
+        >
+          <Image src={backImg} alt="뒤로가기" width={120} height={120} priority />
+        </button>
+      )}
 
       <div className="absolute top-[64px] right-[100px] flex items-center gap-[26px]">
         <p className="font-malrangiche text-[30px] text-[#333333]">점수</p>
@@ -224,24 +270,26 @@ const TrafficRound1Page = () => {
 
       <motion.div
         className="absolute bottom-[200px] left-1/2 -translate-x-1/2"
-        variants={{
-          idle: {
-            x: 0,
-            y: 0,
-            transition: { duration: 0.3, ease: 'easeOut' },
-          },
-          drive: {
-            x: [0, 4, 0, -4, 0],
-            y: [0, -22, -4, -16, 0],
-            transition: {
-              duration: 1.2,
-              repeat: Infinity,
-              repeatType: 'loop',
-              ease: 'easeInOut',
-            },
-          },
-        }}
-        animate={isCarMoving && failCount < 3 ? 'drive' : 'idle'}
+        animate={
+          isCarMoving && failCount < 3
+            ? {
+                x: [0, 12, 0, -8, 0],
+                y: [0, -26, -8, -20, 0],
+                scale: [0.96, 0.88, 0.84, 0.88, 0.96],
+                transition: {
+                  duration: currentRound.interval / 1000,
+                  repeat: Infinity,
+                  repeatType: 'loop',
+                  ease: 'easeInOut',
+                },
+              }
+            : {
+                x: 0,
+                y: 0,
+                scale: 1.06,
+                transition: { duration: 0.55, ease: 'easeOut' },
+              }
+        }
       >
         <div className="relative">
           <Image src={carImage} alt="자동차" width={440} height={360} priority />
@@ -249,8 +297,16 @@ const TrafficRound1Page = () => {
             <motion.div
               className="absolute -right-10 bottom-12"
               initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0 }}
+              animate={{
+                opacity: 1,
+                scale: [1, 1.08, 0.96, 1.08, 1],
+              }}
+              transition={{
+                duration: 1.6,
+                repeat: Infinity,
+                repeatType: 'loop',
+                ease: 'easeInOut',
+              }}
             >
               <Image src={gasGaugeImage} alt="연료 게이지" width={150} height={120} priority />
             </motion.div>
@@ -270,4 +326,4 @@ const TrafficRound1Page = () => {
   );
 };
 
-export default TrafficRound1Page;
+export default Round;
