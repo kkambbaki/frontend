@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { forwardRef, useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { DropdownSelect } from '@/components/ui/dropdown-select';
 
@@ -14,9 +14,11 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   helperText?: string;
   helperTextVariant?: 'default' | 'success' | 'error';
   onBirthComplete?: (isComplete: boolean) => void;
+  onBirthChange?: (birth: string) => void;
+  onGenderChange?: (gender: 'M' | 'F') => void;
 }
 
-export const Input = React.forwardRef<HTMLInputElement, InputProps>(
+export const Input = forwardRef<HTMLInputElement, InputProps>(
   (
     {
       className,
@@ -28,19 +30,26 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
       helperText,
       helperTextVariant = 'default',
       onBirthComplete,
+      onBirthChange,
+      onGenderChange,
       ...props
     },
     ref
   ) => {
-    const [gender, setGender] = React.useState<'male' | 'female' | null>(null);
-    const [year, setYear] = React.useState('');
-    const [month, setMonth] = React.useState('');
+    const [gender, setGender] = useState<'male' | 'female' | null>(null);
+    const [year, setYear] = useState('');
+    const [month, setMonth] = useState('');
 
-    React.useEffect(() => {
+    useEffect(() => {
       if (variant === 'birth' && onBirthComplete) {
-        onBirthComplete(!!(year && month));
+        const complete = !!(year && month);
+        onBirthComplete(complete);
+        if (complete && onBirthChange) {
+          const birthValue = `${year.replace('년', '')}-${month.replace('월', '').padStart(2, '0')}`;
+          onBirthChange(birthValue);
+        }
       }
-    }, [year, month, variant, onBirthComplete]);
+    }, [year, month, variant, onBirthComplete, onBirthChange]);
 
     // 년 / 월 옵션
     const years = Array.from({ length: 100 }, (_, i) => `${new Date().getFullYear() - i}년`);
@@ -85,26 +94,6 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             />
           );
 
-        case 'password':
-          return (
-            <input
-              ref={ref}
-              {...props}
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              onChange={(e) => {
-                e.target.value = e.target.value.replace(/[^0-9]/g, '');
-                props.onChange?.(e);
-              }}
-              className={cn(
-                'flex-1 bg-transparent outline-none text-input-text placeholder:text-placeholder-text',
-                label ? 'text-right' : 'text-center text-3xl font-extrabold',
-                error && 'text-error-text placeholder:text-error-text'
-              )}
-            />
-          );
-
         case 'gender':
           return (
             <div className={cn('flex gap-4 ml-auto', error && 'text-error-text')}>
@@ -119,7 +108,10 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
                         : 'bg-button-text border-none'
                       : 'border-[#BDBDBD]'
                   )}
-                  onClick={() => setGender('male')}
+                  onClick={() => {
+                    setGender('male');
+                    onGenderChange?.('M');
+                  }}
                 >
                   <div
                     className={cn(
@@ -130,6 +122,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
                 </button>
                 <p>남자</p>
               </div>
+
               <div className="flex gap-1.5 items-center">
                 <button
                   type="button"
@@ -141,7 +134,10 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
                         : 'bg-button-text border-none'
                       : 'border-[#BDBDBD]'
                   )}
-                  onClick={() => setGender('female')}
+                  onClick={() => {
+                    setGender('female');
+                    onGenderChange?.('F');
+                  }}
                 >
                   <div
                     className={cn(
@@ -174,7 +170,6 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
     return (
       <div className="w-full flex flex-col gap-1 text-xl">
-        {/* 입력 영역 */}
         <div className={cn(baseClass, className)}>
           {label && (
             <label

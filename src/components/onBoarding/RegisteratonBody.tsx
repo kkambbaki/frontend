@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import PrimaryButton from '../common/PrimaryButton';
 import { Input } from '../common/Input';
+import { createChildUser } from '@/lib/api/auth/childApi';
 
 interface RegisteratonBodyProps {
   onNext?: () => void;
@@ -11,11 +12,26 @@ interface RegisteratonBodyProps {
 const RegisteratonBody: React.FC<RegisteratonBodyProps> = ({ onNext }) => {
   const [childName, setChildName] = useState('');
   const [isBirthComplete, setIsBirthComplete] = useState(false);
+  const [birth, setBirth] = useState('');
+  const [gender, setGender] = useState<'M' | 'F' | undefined>(undefined);
+  const [loading, setLoading] = useState(false);
 
   const isConfirmDisabled = !childName.trim() || !isBirthComplete;
 
-  const handleConfirm = () => {
-    onNext?.();
+  const handleConfirm = async () => {
+    try {
+      setLoading(true);
+      await createChildUser({
+        name: childName,
+        birthYear: parseInt(birth.split('-')[0], 10),
+        gender: gender ?? 'M',
+      });
+      onNext?.();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -23,6 +39,7 @@ const RegisteratonBody: React.FC<RegisteratonBodyProps> = ({ onNext }) => {
       <h2 className="text-[26px] font-nanum font-extrabold text-[#53514F]">
         아이 정보를 알려주세요
       </h2>
+
       <div className="flex flex-col gap-[34px]">
         <Input
           label="아이 이름"
@@ -30,9 +47,17 @@ const RegisteratonBody: React.FC<RegisteratonBodyProps> = ({ onNext }) => {
           value={childName}
           onChange={(e) => setChildName(e.target.value)}
         />
-        <Input label="아이 생년/월" variant="birth" onBirthComplete={setIsBirthComplete} />
-        <Input label="아이 성별(선택)" variant="gender" />
+
+        <Input
+          label="아이 생년/월"
+          variant="birth"
+          onBirthComplete={setIsBirthComplete}
+          onBirthChange={setBirth}
+        />
+
+        <Input label="아이 성별(선택)" variant="gender" onGenderChange={setGender} />
       </div>
+
       <div className="flex justify-end gap-[26px]">
         <PrimaryButton variant="xs" color="gray">
           취소
@@ -40,10 +65,10 @@ const RegisteratonBody: React.FC<RegisteratonBodyProps> = ({ onNext }) => {
         <PrimaryButton
           variant="xs"
           color="orange"
-          disabled={isConfirmDisabled}
+          disabled={isConfirmDisabled || loading}
           onClick={handleConfirm}
         >
-          확인
+          {loading ? '등록 중...' : '확인'}
         </PrimaryButton>
       </div>
     </div>
