@@ -12,7 +12,7 @@ export interface RegisterResponse {
 }
 
 export const signup = async (payload: RegisterRequest): Promise<RegisterResponse> => {
-  const { data } = await apiClient.post<RegisterResponse>('/api/v1/users/registration/', payload);
+  const { data } = await apiClient.post<RegisterResponse>('/users/registration/', payload);
 
   return data;
 };

@@ -12,6 +12,7 @@ import fingerImage from '@/assets/images/finger.png';
 import GameBoard, { GameStats } from '@/pageComponents/star-game/round/components/GameBoard';
 import ScoreBoard from '@/components/common/ScoreBoard';
 import { useRouter } from 'next/navigation';
+import { endStarGame, startStarGame } from '@/lib/api/game/star/starApi';
 
 const Round = () => {
   const router = useRouter();
@@ -23,6 +24,7 @@ const Round = () => {
 
   // 결과 모달 상태
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
 
   // 타이머 관련
   const [progress, setProgress] = useState(100);
@@ -76,6 +78,38 @@ const Round = () => {
     return () => timers.forEach(clearTimeout);
   }, [round]);
 
+  // 게임 종료 API 호출
+  const handleGameEnd = async (finalStats: GameStats) => {
+    if (isSaved) {
+      console.log('이미 저장된 게임입니다.');
+      return;
+    }
+
+    const sessionId = window.sessionStorage.getItem('gameSessionId');
+
+    if (!sessionId) {
+      console.error('❌ sessionId가 없습니다.');
+      return;
+    }
+
+    try {
+      const payload = {
+        sessionId,
+        score,
+        wrongCount: finalStats.wrongClicks,
+        reactionMsSum: 0,
+        roundCount: finalStats.successRounds,
+        successCount: score, // 점수 = 성공 클릭 수
+      };
+
+      const res = await endStarGame(payload);
+      console.log('✅ 게임 종료 성공:', res);
+      setIsSaved(true);
+    } catch (error) {
+      console.error('❌ 게임 종료 실패:', error);
+    }
+  };
+
   // 인지 단계 클릭
   const handleOverlayClick = () => {
     if (overlayStep === 3) {
@@ -86,27 +120,46 @@ const Round = () => {
     }
   };
 
-  // 시간 초과 시 모달 오픈
-  const handleTimeOver = () => {
+  // 시간 초과 시
+  const handleTimeOver = async () => {
+    if (round >= 10) return;
+
     setTimerRunning(false);
     setGameStarted(false);
+
+    // 즉시 저장
+    await handleGameEnd(totalStats);
     setIsModalOpen(true);
   };
 
-  const handleRestart = () => {
-    setIsModalOpen(false);
-    setScore(0);
-    setRound(1);
-    setOverlayStep(0);
-    setProgress(100);
-    setTimerRunning(false);
+  const handleRestart = async () => {
+    try {
+      setIsModalOpen(false);
+      setScore(0);
+      setRound(1);
+      setOverlayStep(0);
+      setProgress(100);
+      setTimerRunning(false);
+      setIsSaved(false);
 
-    const timers = [
-      setTimeout(() => setOverlayStep(1), 1500),
-      setTimeout(() => setOverlayStep(2), 3000),
-      setTimeout(() => setOverlayStep(3), 4500),
-    ];
-    return () => timers.forEach(clearTimeout);
+      // 기존 세션 제거
+      window.sessionStorage.removeItem('gameSessionId');
+
+      // 새 세션 발급
+      const res = await startStarGame();
+      window.sessionStorage.setItem('gameSessionId', res.sessionId);
+
+      // 오버레이 단계 초기화
+      const timers = [
+        setTimeout(() => setOverlayStep(1), 1500),
+        setTimeout(() => setOverlayStep(2), 3000),
+        setTimeout(() => setOverlayStep(3), 4500),
+      ];
+      return () => timers.forEach(clearTimeout);
+    } catch (error) {
+      console.error('❌ 다시하기 중 세션 재발급 실패:', error);
+      alert('새 게임을 시작할 수 없습니다. 다시 시도해주세요.');
+    }
   };
 
   const overlayText =
@@ -129,8 +182,13 @@ const Round = () => {
           <ScoreBoard
             type="star"
             score={score}
-            onClose={() => router.push('/main')}
-            onRetry={handleRestart}
+            onClose={() => {
+              window.sessionStorage.removeItem('gameSessionId'); // 세션 제거
+              router.push('/main');
+            }}
+            onRetry={() => {
+              handleRestart();
+            }}
           />
         </div>
       )}
@@ -265,23 +323,29 @@ const Round = () => {
                   setProgress(100);
                   setTimerRunning(true);
                 }}
-                onRoundComplete={(stats) => {
+                onRoundComplete={async (roundStats) => {
                   setTimerRunning(false);
                   setGameStarted(false);
                   setOverlayStep(5);
 
+                  // 이번 라운드의 stats만 누적
                   setTotalStats((prev) => ({
-                    totalClicks: prev.totalClicks + stats.totalClicks,
-                    wrongClicks: prev.wrongClicks + stats.wrongClicks,
-                    correctClicks: prev.correctClicks + stats.correctClicks,
-                    successRounds: prev.successRounds + stats.successRounds,
+                    totalClicks: prev.totalClicks + roundStats.totalClicks,
+                    wrongClicks: prev.wrongClicks + roundStats.wrongClicks,
+                    correctClicks: prev.correctClicks + roundStats.correctClicks,
+                    successRounds: prev.successRounds + roundStats.successRounds,
                   }));
 
-                  // 게임 클리어 시 모달 오픈
+                  // 게임 클리어 시 즉시 저장
                   if (round >= 10) {
-                    setTimeout(() => {
-                      setIsModalOpen(true);
-                    }, 1500);
+                    const finalStats = {
+                      totalClicks: totalStats.totalClicks + roundStats.totalClicks,
+                      wrongClicks: totalStats.wrongClicks + roundStats.wrongClicks,
+                      correctClicks: totalStats.correctClicks + roundStats.correctClicks,
+                      successRounds: totalStats.successRounds + roundStats.successRounds,
+                    };
+                    await handleGameEnd(finalStats);
+                    setTimeout(() => setIsModalOpen(true), 1500);
                     return;
                   }
 
@@ -297,7 +361,16 @@ const Round = () => {
 
       {/* 뒤로가기 */}
       <div className="absolute top-10 left-16 z-[60] cursor-pointer hover:scale-105 transition-transform">
-        <Image src={backButton} alt="back-button" width={120} priority />
+        <Image
+          src={backButton}
+          alt="back-button"
+          width={120}
+          priority
+          onClick={() => {
+            window.sessionStorage.removeItem('gameSessionId'); // 세션 제거
+            router.push('/main');
+          }}
+        />
       </div>
     </div>
   );

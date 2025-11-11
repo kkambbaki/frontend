@@ -16,7 +16,7 @@ export const signin = async (payload: LoginRequest): Promise<LoginResponse> => {
   body.append('username', payload.username);
   body.append('password', payload.password);
 
-  const { data } = await apiClient.post<LoginResponse>('/api/v1/users/login/', body, {
+  const { data } = await apiClient.post<LoginResponse>('/users/login/', body, {
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
     },

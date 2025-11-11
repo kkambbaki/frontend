@@ -5,7 +5,7 @@ export interface CheckUsernameResponse {
 }
 
 export const checkUsername = async (username: string): Promise<CheckUsernameResponse> => {
-  const { data } = await apiClient.get<CheckUsernameResponse>('/api/v1/users/check-username/', {
+  const { data } = await apiClient.get<CheckUsernameResponse>('/users/check-username/', {
     params: { username },
   });
 
