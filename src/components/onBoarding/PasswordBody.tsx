@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import PrimaryButton from '../common/PrimaryButton';
 import { Input } from '../common/Input';
@@ -14,10 +14,19 @@ const PasswordBody = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [modalType, setModalType] = useState<ModalType>(null);
+  const [isTouched, setIsTouched] = useState(false);
 
-  const isConfirmDisabled = !password.trim() || password.length < 4;
+  const PASSWORD_GUIDE_MESSAGE = '비밀번호는 숫자 4~6자리로 입력해 주세요.';
+
+  const isPasswordValid = useMemo(() => /^\d{4,6}$/.test(password), [password]);
+
+  const isConfirmDisabled = !isPasswordValid || loading;
 
   const handleConfirm = async () => {
+    if (!isPasswordValid) {
+      return;
+    }
+
     try {
       setLoading(true);
       const res = await setReportPin({ pin: password });
@@ -57,11 +66,21 @@ const PasswordBody = () => {
 
         <div className="flex justify-center mb-[54px]">
           <Input
-            label="비밀번호 4자리 이상"
+            label="비밀번호 4~6자리"
             variant="password"
             type="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => {
+              if (!isTouched) {
+                setIsTouched(true);
+              }
+
+              const nextValue = e.target.value.slice(0, 6);
+              setPassword(nextValue);
+            }}
+            error={isTouched && !isPasswordValid}
+            errorText={isTouched && !isPasswordValid ? PASSWORD_GUIDE_MESSAGE : undefined}
+            helperText={!isTouched ? PASSWORD_GUIDE_MESSAGE : undefined}
           />
         </div>
 
@@ -69,7 +88,7 @@ const PasswordBody = () => {
           <PrimaryButton
             variant="xs"
             color="orange"
-            disabled={isConfirmDisabled || loading}
+            disabled={isConfirmDisabled}
             onClick={handleConfirm}
           >
             {loading ? '등록 중...' : '완료'}
