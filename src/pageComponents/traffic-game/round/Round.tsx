@@ -65,6 +65,7 @@ const Round: React.FC<RoundProps> = ({ onBack }) => {
   const roundReactionMsRef = useRef(0);
   const roundTimeLimitExceededRef = useRef(false);
   const hasFlushedCurrentRoundRef = useRef(false);
+  const sessionInitializedRef = useRef(false);
 
   const currentRound = useMemo(
     () => ROUND_CONFIG[Math.min(roundIndex, ROUND_CONFIG.length - 1)],
@@ -246,7 +247,7 @@ const Round: React.FC<RoundProps> = ({ onBack }) => {
           },
         });
       } catch (error) {
-        console.error('이전 게임 세션 종료에 실패했어요.', error);
+        // 이전 게임 세션 종료 실패는 무시
       }
     }
 
@@ -272,6 +273,7 @@ const Round: React.FC<RoundProps> = ({ onBack }) => {
     roundReactionMsRef.current = 0;
     roundTimeLimitExceededRef.current = false;
     hasFlushedCurrentRoundRef.current = false;
+    sessionInitializedRef.current = false; // 재시작 시 초기화 플래그도 리셋
     setResetKey((prev) => prev + 1);
   }, [completedRounds, roundDetails, score, sessionId, totalReactionMs, totalWrongCount]);
 
@@ -299,13 +301,19 @@ const Round: React.FC<RoundProps> = ({ onBack }) => {
   ]);
 
   const initializeSession = useCallback(async () => {
+    if (sessionId || sessionInitializedRef.current) {
+      return;
+    }
+
+    sessionInitializedRef.current = true;
+
     try {
       const response = await startTrafficGame();
       const nextSessionId = response.sessionId ?? null;
       setSessionId(nextSessionId);
       finishRequestedRef.current = false;
     } catch (error) {
-      console.error('교통지킴이 게임 세션 시작에 실패했어요.', error);
+      sessionInitializedRef.current = false; // 실패 시 다시 시도할 수 있도록
       if (
         error &&
         typeof error === 'object' &&
@@ -319,12 +327,11 @@ const Round: React.FC<RoundProps> = ({ onBack }) => {
         const errorMessage =
           errorResponse.data?.message ||
           '게임을 시작할 수 없어요. 게임이 활성화되어 있는지, 또는 자녀 정보가 등록되어 있는지 확인해 주세요.';
-        console.error(errorMessage);
         alert(errorMessage);
       }
       setSessionId(null);
     }
-  }, []);
+  }, [sessionId]);
 
   useEffect(() => {
     initializeSession();
@@ -351,7 +358,7 @@ const Round: React.FC<RoundProps> = ({ onBack }) => {
           },
         });
       } catch (error) {
-        console.error('교통지킴이 게임 세션 종료에 실패했어요.', error);
+        // 게임 세션 종료 실패는 무시
       }
     };
 
