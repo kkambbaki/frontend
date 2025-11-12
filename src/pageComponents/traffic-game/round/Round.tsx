@@ -12,6 +12,7 @@ import carImage from '@/assets/images/car.png';
 import gasGaugeImage from '@/assets/images/gas.png';
 import backImg from '@/assets/icons/back.svg';
 import ScoreBoard from '@/components/common/ScoreBoard';
+import { finishTrafficGame, startTrafficGame } from '@/lib/api/game/traffic';
 
 const ROUND_CONFIG = [
   { round: 1, changeCount: 5, interval: 4000 },
@@ -30,6 +31,15 @@ interface RoundProps {
   onBack?: () => void;
 }
 
+interface RoundDetail {
+  round_number: number;
+  score: number;
+  wrong_count: number;
+  reaction_ms_sum: number;
+  is_success: boolean;
+  time_limit_exceeded: boolean;
+}
+
 const Round: React.FC<RoundProps> = ({ onBack }) => {
   const router = useRouter();
   const [roundIndex, setRoundIndex] = useState(0);
@@ -38,11 +48,23 @@ const Round: React.FC<RoundProps> = ({ onBack }) => {
   const [failCount, setFailCount] = useState(0);
   const [lightState, setLightState] = useState<'red' | 'green'>('red');
   const [buttonsDisabled, setButtonsDisabled] = useState(true);
-  const [changeCount, setChangeCount] = useState(0);
+  const [, setChangeCount] = useState(0);
   const [isCarMoving, setIsCarMoving] = useState(false);
   const [isGameOver, setIsGameOver] = useState(false);
   const [resetKey, setResetKey] = useState(0);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [totalWrongCount, setTotalWrongCount] = useState(0);
+  const [completedRounds, setCompletedRounds] = useState(0);
+  const [totalReactionMs, setTotalReactionMs] = useState(0);
+  const [roundDetails, setRoundDetails] = useState<RoundDetail[]>([]);
   const cycleRespondedRef = useRef(false);
+  const finishRequestedRef = useRef(false);
+  const lastSignalChangeTimeRef = useRef<number | null>(null);
+  const roundScoreRef = useRef(0);
+  const roundWrongCountRef = useRef(0);
+  const roundReactionMsRef = useRef(0);
+  const roundTimeLimitExceededRef = useRef(false);
+  const hasFlushedCurrentRoundRef = useRef(false);
 
   const currentRound = useMemo(
     () => ROUND_CONFIG[Math.min(roundIndex, ROUND_CONFIG.length - 1)],
@@ -52,10 +74,17 @@ const Round: React.FC<RoundProps> = ({ onBack }) => {
 
   useEffect(() => {
     cycleRespondedRef.current = false;
+    lastSignalChangeTimeRef.current = null;
     setOverlayStep('round');
     setButtonsDisabled(true);
     setLightState('red');
     setIsCarMoving(false);
+    roundScoreRef.current = 0;
+    roundWrongCountRef.current = 0;
+    roundReactionMsRef.current = 0;
+    roundTimeLimitExceededRef.current = false;
+    hasFlushedCurrentRoundRef.current = false;
+
     const timers = [
       setTimeout(() => setOverlayStep('ready'), 800),
       setTimeout(() => setOverlayStep('start'), 1600),
@@ -65,26 +94,67 @@ const Round: React.FC<RoundProps> = ({ onBack }) => {
         setLightState('green');
         setIsCarMoving(false);
         cycleRespondedRef.current = false;
+        lastSignalChangeTimeRef.current = performance.now();
       }, 2400),
     ];
 
     return () => timers.forEach(clearTimeout);
   }, [roundIndex, resetKey]);
 
-  const registerFail = useCallback(() => {
-    setFailCount((prev) => {
-      const next = Math.min(prev + 1, 3);
-      if (next >= 3) {
-        setButtonsDisabled(true);
-        setIsGameOver(true);
-        setIsCarMoving(false);
-        setOverlayStep('none');
+  const flushCurrentRound = useCallback(
+    (isSuccess: boolean) => {
+      if (hasFlushedCurrentRoundRef.current) {
+        return;
       }
-      return next;
-    });
-  }, []);
+
+      const detail: RoundDetail = {
+        round_number: roundIndex + 1,
+        score: roundScoreRef.current,
+        wrong_count: roundWrongCountRef.current,
+        reaction_ms_sum: roundReactionMsRef.current,
+        is_success: isSuccess,
+        time_limit_exceeded: roundTimeLimitExceededRef.current,
+      };
+
+      setRoundDetails((prev) => [...prev, detail]);
+
+      if (isSuccess) {
+        setCompletedRounds((prev) => prev + 1);
+      }
+
+      hasFlushedCurrentRoundRef.current = true;
+    },
+    [roundIndex]
+  );
+
+  const registerFail = useCallback(
+    (options?: { timeLimitExceeded?: boolean }) => {
+      setTotalWrongCount((prev) => prev + 1);
+      roundWrongCountRef.current += 1;
+      if (options?.timeLimitExceeded) {
+        roundTimeLimitExceededRef.current = true;
+      }
+      setFailCount((prev) => {
+        const next = Math.min(prev + 1, 3);
+        if (next >= 3) {
+          flushCurrentRound(false);
+          setButtonsDisabled(true);
+          setIsGameOver(true);
+          setIsCarMoving(false);
+          setOverlayStep('none');
+        }
+        return next;
+      });
+    },
+    [flushCurrentRound]
+  );
 
   const advanceRound = useCallback(() => {
+    if (hasFlushedCurrentRoundRef.current) {
+      return;
+    }
+
+    flushCurrentRound(true);
     if (isLastRound) {
       setOverlayStep('none');
       setButtonsDisabled(true);
@@ -97,7 +167,7 @@ const Round: React.FC<RoundProps> = ({ onBack }) => {
     setChangeCount(0);
     cycleRespondedRef.current = false;
     setIsCarMoving(true);
-  }, [isLastRound]);
+  }, [flushCurrentRound, isLastRound]);
 
   const handleGreen = () => {
     if (buttonsDisabled) return;
@@ -107,6 +177,13 @@ const Round: React.FC<RoundProps> = ({ onBack }) => {
     }
     if (cycleRespondedRef.current) return;
     cycleRespondedRef.current = true;
+    const now = performance.now();
+    if (lastSignalChangeTimeRef.current != null) {
+      const reaction = Math.max(0, Math.round(now - lastSignalChangeTimeRef.current));
+      setTotalReactionMs((prev) => prev + reaction);
+      roundReactionMsRef.current += reaction;
+    }
+    roundScoreRef.current += 1;
     setScore((prev) => prev + 1);
     setIsCarMoving(true);
   };
@@ -119,19 +196,27 @@ const Round: React.FC<RoundProps> = ({ onBack }) => {
     }
     if (cycleRespondedRef.current) return;
     cycleRespondedRef.current = true;
+    const now = performance.now();
+    if (lastSignalChangeTimeRef.current != null) {
+      const reaction = Math.max(0, Math.round(now - lastSignalChangeTimeRef.current));
+      setTotalReactionMs((prev) => prev + reaction);
+      roundReactionMsRef.current += reaction;
+    }
+    roundScoreRef.current += 1;
     setScore((prev) => prev + 1);
     setIsCarMoving(false);
   };
 
   const handleSignalChange = useCallback(() => {
     if (!cycleRespondedRef.current) {
-      registerFail();
+      registerFail({ timeLimitExceeded: true });
     }
     cycleRespondedRef.current = false;
 
     const nextState = lightState === 'red' ? 'green' : 'red';
     setLightState(nextState);
     setIsCarMoving(nextState === 'red');
+    lastSignalChangeTimeRef.current = performance.now();
 
     setChangeCount((prev) => {
       const next = prev + 1;
@@ -143,7 +228,28 @@ const Round: React.FC<RoundProps> = ({ onBack }) => {
     });
   }, [advanceRound, currentRound.changeCount, registerFail, lightState]);
 
-  const handleRestart = useCallback(() => {
+  const handleRestart = useCallback(async () => {
+    // 재시작 전에 현재 세션이 있으면 종료
+    const currentSessionId = sessionId;
+    if (currentSessionId && !finishRequestedRef.current) {
+      finishRequestedRef.current = true;
+      try {
+        await finishTrafficGame({
+          sessionId: currentSessionId,
+          score,
+          wrongCount: totalWrongCount,
+          roundCount: roundDetails.length,
+          successCount: completedRounds,
+          reactionMsSum: Math.round(totalReactionMs),
+          meta: {
+            round_details: roundDetails,
+          },
+        });
+      } catch (error) {
+        console.error('이전 게임 세션 종료에 실패했어요.', error);
+      }
+    }
+
     setScore(0);
     setFailCount(0);
     setRoundIndex(0);
@@ -153,9 +259,21 @@ const Round: React.FC<RoundProps> = ({ onBack }) => {
     setOverlayStep('round');
     setIsCarMoving(true);
     setIsGameOver(false);
+    setSessionId(null);
+    setTotalWrongCount(0);
+    setCompletedRounds(0);
+    setTotalReactionMs(0);
+    setRoundDetails([]);
     cycleRespondedRef.current = false;
+    finishRequestedRef.current = false;
+    lastSignalChangeTimeRef.current = null;
+    roundScoreRef.current = 0;
+    roundWrongCountRef.current = 0;
+    roundReactionMsRef.current = 0;
+    roundTimeLimitExceededRef.current = false;
+    hasFlushedCurrentRoundRef.current = false;
     setResetKey((prev) => prev + 1);
-  }, []);
+  }, [completedRounds, roundDetails, score, sessionId, totalReactionMs, totalWrongCount]);
 
   useEffect(() => {
     if (overlayStep !== 'none' || failCount >= 3 || isGameOver) {
@@ -178,6 +296,74 @@ const Round: React.FC<RoundProps> = ({ onBack }) => {
     currentRound.interval,
     handleSignalChange,
     isGameOver,
+  ]);
+
+  const initializeSession = useCallback(async () => {
+    try {
+      const response = await startTrafficGame();
+      const nextSessionId = response.sessionId ?? null;
+      setSessionId(nextSessionId);
+      finishRequestedRef.current = false;
+    } catch (error) {
+      console.error('교통지킴이 게임 세션 시작에 실패했어요.', error);
+      if (
+        error &&
+        typeof error === 'object' &&
+        'response' in error &&
+        error.response &&
+        typeof error.response === 'object' &&
+        'status' in error.response &&
+        error.response.status === 404
+      ) {
+        const errorResponse = error.response as { data?: { message?: string } };
+        const errorMessage =
+          errorResponse.data?.message ||
+          '게임을 시작할 수 없어요. 게임이 활성화되어 있는지, 또는 자녀 정보가 등록되어 있는지 확인해 주세요.';
+        console.error(errorMessage);
+        alert(errorMessage);
+      }
+      setSessionId(null);
+    }
+  }, []);
+
+  useEffect(() => {
+    initializeSession();
+  }, [initializeSession, resetKey]);
+
+  useEffect(() => {
+    if (!isGameOver || !sessionId || finishRequestedRef.current) {
+      return;
+    }
+
+    finishRequestedRef.current = true;
+
+    const submitResult = async () => {
+      try {
+        await finishTrafficGame({
+          sessionId,
+          score,
+          wrongCount: totalWrongCount,
+          roundCount: roundDetails.length,
+          successCount: completedRounds,
+          reactionMsSum: Math.round(totalReactionMs),
+          meta: {
+            round_details: roundDetails,
+          },
+        });
+      } catch (error) {
+        console.error('교통지킴이 게임 세션 종료에 실패했어요.', error);
+      }
+    };
+
+    void submitResult();
+  }, [
+    completedRounds,
+    isGameOver,
+    roundDetails,
+    score,
+    sessionId,
+    totalReactionMs,
+    totalWrongCount,
   ]);
 
   return (

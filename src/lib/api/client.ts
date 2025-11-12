@@ -14,10 +14,14 @@ export const api: AxiosInstance = axios.create({
   withCredentials: true,
 });
 
-// 토큰 자동 포함
+// 토큰 자동 포함 (로그인/회원가입 엔드포인트 제외)
 api.interceptors.request.use(
   (config) => {
-    if (typeof window !== 'undefined') {
+    // 로그인/회원가입 엔드포인트는 토큰이 필요 없음
+    const url = config.url ?? '';
+    const isAuthEndpoint = url.includes('/login/') || url.includes('/registration/');
+
+    if (typeof window !== 'undefined' && !isAuthEndpoint) {
       const token = window.sessionStorage.getItem('accessToken');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;

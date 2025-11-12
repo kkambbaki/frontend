@@ -1,4 +1,4 @@
-import apiClient from '@/lib/api/client';
+import api from '@/lib/api/client';
 
 export interface RegisterRequest {
   username: string;
@@ -12,7 +12,7 @@ export interface RegisterResponse {
 }
 
 export const signup = async (payload: RegisterRequest): Promise<RegisterResponse> => {
-  const { data } = await apiClient.post<RegisterResponse>('/users/registration/', payload);
+  const { data } = await api.post<RegisterResponse>('/users/registration/', payload);
 
   return data;
 };
