@@ -148,7 +148,7 @@ const SignupBody = () => {
 
   return (
     <div className="flex flex-col">
-      <div className="flex flex-col gap-[54px] mb-[90px]">
+      <div className="flex flex-col gap-[20px] mb-[60px]">
         <div className="flex flex-col gap-4">
           <div className="flex items-start gap-6">
             <Input
@@ -186,7 +186,7 @@ const SignupBody = () => {
       <BaseButton variant="lg" disabled={isSignupDisabled} onClick={handleRegister}>
         회원가입
       </BaseButton>
-      <div className="mt-4 min-h-[32px] text-center text-xl font-bold">
+      <div className="text-center text-xl font-bold mb-[10px] mt-[10px]">
         {formMessage ? (
           <span className={isFormError ? 'text-[#CE2D2D]' : 'text-[#3D7F0B]'}>{formMessage}</span>
         ) : (
@@ -195,7 +195,7 @@ const SignupBody = () => {
       </div>
       <a
         href="/signin"
-        className="text-center underline font-bold decoration-1 underline-offset-7 text-xl text-[#D3770E] mt-[24px]"
+        className="text-center underline font-bold decoration-1 underline-offset-7 text-xl text-[#D3770E]"
       >
         이미 계정이 있으신가요?
       </a>

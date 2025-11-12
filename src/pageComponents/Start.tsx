@@ -1,3 +1,5 @@
+'use client';
+
 import Header from '@/components/common/Header';
 import StartBody from '@/components/onBoarding/StartBody';
 import React from 'react';
