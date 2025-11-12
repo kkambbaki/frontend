@@ -48,7 +48,7 @@ const Round: React.FC<RoundProps> = ({ onBack }) => {
   const [failCount, setFailCount] = useState(0);
   const [lightState, setLightState] = useState<'red' | 'green'>('red');
   const [buttonsDisabled, setButtonsDisabled] = useState(true);
-  const [changeCount, setChangeCount] = useState(0);
+  const [, setChangeCount] = useState(0);
   const [isCarMoving, setIsCarMoving] = useState(false);
   const [isGameOver, setIsGameOver] = useState(false);
   const [resetKey, setResetKey] = useState(0);
@@ -301,14 +301,23 @@ const Round: React.FC<RoundProps> = ({ onBack }) => {
   const initializeSession = useCallback(async () => {
     try {
       const response = await startTrafficGame();
-      const nextSessionId = response.sessionId ?? (response as any).session_id ?? null;
+      const nextSessionId = response.sessionId ?? null;
       setSessionId(nextSessionId);
       finishRequestedRef.current = false;
-    } catch (error: any) {
+    } catch (error) {
       console.error('교통지킴이 게임 세션 시작에 실패했어요.', error);
-      if (error?.response?.status === 404) {
+      if (
+        error &&
+        typeof error === 'object' &&
+        'response' in error &&
+        error.response &&
+        typeof error.response === 'object' &&
+        'status' in error.response &&
+        error.response.status === 404
+      ) {
+        const errorResponse = error.response as { data?: { message?: string } };
         const errorMessage =
-          error?.response?.data?.message ||
+          errorResponse.data?.message ||
           '게임을 시작할 수 없어요. 게임이 활성화되어 있는지, 또는 자녀 정보가 등록되어 있는지 확인해 주세요.';
         console.error(errorMessage);
         alert(errorMessage);
