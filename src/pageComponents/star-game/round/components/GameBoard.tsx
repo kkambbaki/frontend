@@ -15,7 +15,7 @@ interface GameBoardProps {
   round: number;
   setScore: React.Dispatch<React.SetStateAction<number>>;
   onRoundComplete: (stats: GameStats) => void;
-  onMemoryEnd: () => void; // 인지단계 끝났을 때 (타이머 시작)
+  onMemoryEnd: () => void;
 }
 
 export default function GameBoard({
@@ -32,8 +32,8 @@ export default function GameBoard({
   const [wrongIndex, setWrongIndex] = useState<number | null>(null);
   const [shake, setShake] = useState(false);
 
-  // 기록용
-  const [stats, setStats] = useState<GameStats>({
+  // 이번 라운드의 통계만 기록
+  const [roundStats, setRoundStats] = useState<GameStats>({
     totalClicks: 0,
     wrongClicks: 0,
     correctClicks: 0,
@@ -67,17 +67,28 @@ export default function GameBoard({
     setSequence(seq);
     setUserInput([]);
     setPoppedStars([]);
+    // 라운드 시작 시 통계 초기화
+    setRoundStats({
+      totalClicks: 0,
+      wrongClicks: 0,
+      correctClicks: 0,
+      successRounds: 0,
+    });
     playSequence(seq);
   }
 
   function handleStarClick(index: number) {
     if (isPlaying) return;
 
-    setStats((prev) => ({ ...prev, totalClicks: prev.totalClicks + 1 }));
-
     const expected = sequence[userInput.length];
+
     if (index !== expected) {
-      setStats((prev) => ({ ...prev, wrongClicks: prev.wrongClicks + 1 }));
+      // 틀렸을 때
+      setRoundStats((prev) => ({
+        ...prev,
+        totalClicks: prev.totalClicks + 1,
+        wrongClicks: prev.wrongClicks + 1,
+      }));
       setWrongIndex(index);
       setShake(true);
       setTimeout(() => {
@@ -89,20 +100,25 @@ export default function GameBoard({
 
     // 정답 클릭
     setUserInput((prev) => [...prev, index]);
-    setStats((prev) => ({ ...prev, correctClicks: prev.correctClicks + 1 }));
-    setScore((prev) => prev + 1); // 점수 누적
+    setScore((prev) => prev + 1);
     setPoppedStars((prev) => [...prev, index]);
 
     // 모든 별 클릭 완료
     if (userInput.length + 1 === sequence.length) {
-      const updatedStats = {
-        ...stats,
-        totalClicks: stats.totalClicks + 1,
-        correctClicks: stats.correctClicks + 1,
-        successRounds: stats.successRounds + 1,
+      const finalRoundStats = {
+        totalClicks: roundStats.totalClicks + 1,
+        wrongClicks: roundStats.wrongClicks,
+        correctClicks: roundStats.correctClicks + 1,
+        successRounds: 1,
       };
-
-      setTimeout(() => onRoundComplete(updatedStats), 1000);
+      setTimeout(() => onRoundComplete(finalRoundStats), 1000);
+    } else {
+      // 아직 라운드 진행 중
+      setRoundStats((prev) => ({
+        ...prev,
+        totalClicks: prev.totalClicks + 1,
+        correctClicks: prev.correctClicks + 1,
+      }));
     }
   }
 

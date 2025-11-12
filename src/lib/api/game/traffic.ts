@@ -1,4 +1,4 @@
-import apiClient from '@/lib/api/client';
+import api from '@/lib/api/client';
 
 export interface TrafficGameStartResponse {
   sessionId: string;
@@ -29,9 +29,7 @@ export interface TrafficGameFinishResponse {
 }
 
 export const startTrafficGame = async (): Promise<TrafficGameStartResponse> => {
-  const { data } = await apiClient.post<TrafficGameStartResponse>(
-    '/api/v1/games/kids-traffic/start/'
-  );
+  const { data } = await api.post<TrafficGameStartResponse>('/games/kids-traffic/start/');
 
   return data;
 };
@@ -63,15 +61,11 @@ export const finishTrafficGame = async (
     body.append('meta', JSON.stringify(payload.meta));
   }
 
-  const { data } = await apiClient.post<TrafficGameFinishResponse>(
-    '/api/v1/games/kids-traffic/finish/',
-    body,
-    {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-    }
-  );
+  const { data } = await api.post<TrafficGameFinishResponse>('/games/kids-traffic/finish/', body, {
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+  });
 
   return data;
 };

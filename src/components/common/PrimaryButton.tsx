@@ -161,7 +161,7 @@ const PrimaryButton: React.FC<PrimaryButtonProps> = ({
       <span
         className="relative z-30 text-center"
         style={{
-          fontFamily: 'NanumSquareRound, sans-serif',
+          fontFamily: 'NanumSquareRoundExtraBold, sans-serif',
           fontSize: currentVariant.fontSize,
           fontStyle: 'normal',
           fontWeight: 800,
