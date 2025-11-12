@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import star from '@/assets/images/star.png';
 
@@ -13,6 +13,7 @@ export type GameStats = {
 
 interface GameBoardProps {
   round: number;
+  statsRef: React.RefObject<GameStats>;
   setScore: React.Dispatch<React.SetStateAction<number>>;
   onRoundComplete: (stats: GameStats) => void;
   onMemoryEnd: () => void;
@@ -21,6 +22,7 @@ interface GameBoardProps {
 export default function GameBoard({
   round,
   setScore,
+  statsRef,
   onRoundComplete,
   onMemoryEnd,
 }: GameBoardProps) {
@@ -31,14 +33,6 @@ export default function GameBoard({
   const [poppedStars, setPoppedStars] = useState<number[]>([]);
   const [wrongIndex, setWrongIndex] = useState<number | null>(null);
   const [shake, setShake] = useState(false);
-
-  // 이번 라운드의 통계만 기록
-  const [roundStats, setRoundStats] = useState<GameStats>({
-    totalClicks: 0,
-    wrongClicks: 0,
-    correctClicks: 0,
-    successRounds: 0,
-  });
 
   useEffect(() => {
     startRound();
@@ -67,13 +61,15 @@ export default function GameBoard({
     setSequence(seq);
     setUserInput([]);
     setPoppedStars([]);
+
     // 라운드 시작 시 통계 초기화
-    setRoundStats({
+    statsRef.current = {
       totalClicks: 0,
       wrongClicks: 0,
       correctClicks: 0,
       successRounds: 0,
-    });
+    };
+
     playSequence(seq);
   }
 
@@ -82,13 +78,15 @@ export default function GameBoard({
 
     const expected = sequence[userInput.length];
 
+    // 클릭 즉시 통계에 반영
+    statsRef.current.totalClicks += 1;
+
     if (index !== expected) {
       // 틀렸을 때
-      setRoundStats((prev) => ({
-        ...prev,
-        totalClicks: prev.totalClicks + 1,
-        wrongClicks: prev.wrongClicks + 1,
-      }));
+      statsRef.current.wrongClicks += 1;
+
+      console.log('❌ 오답 클릭! 현재 통계:', statsRef.current);
+
       setWrongIndex(index);
       setShake(true);
       setTimeout(() => {
@@ -99,26 +97,17 @@ export default function GameBoard({
     }
 
     // 정답 클릭
+    statsRef.current.correctClicks += 1;
     setUserInput((prev) => [...prev, index]);
     setScore((prev) => prev + 1);
     setPoppedStars((prev) => [...prev, index]);
 
+    console.log('✅ 정답 클릭! 현재 통계:', statsRef.current);
+
     // 모든 별 클릭 완료
     if (userInput.length + 1 === sequence.length) {
-      const finalRoundStats = {
-        totalClicks: roundStats.totalClicks + 1,
-        wrongClicks: roundStats.wrongClicks,
-        correctClicks: roundStats.correctClicks + 1,
-        successRounds: 1,
-      };
-      setTimeout(() => onRoundComplete(finalRoundStats), 1000);
-    } else {
-      // 아직 라운드 진행 중
-      setRoundStats((prev) => ({
-        ...prev,
-        totalClicks: prev.totalClicks + 1,
-        correctClicks: prev.correctClicks + 1,
-      }));
+      console.log('🎉 라운드 클리어! 최종 통계:', statsRef.current);
+      setTimeout(() => onRoundComplete(statsRef.current), 1000);
     }
   }
 

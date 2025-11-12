@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import starGameBackgroundImage from '@/assets/images/star-game-backgroundimage.png';
 import starGameProgressBarImage from '@/assets/images/progress-bar.png';
 import backButton from '@/assets/icons/back.svg';
@@ -31,8 +31,8 @@ const Round = () => {
   const [timeLeft, setTimeLeft] = useState(10);
   const [timerRunning, setTimerRunning] = useState(false);
 
-  // 기록용
-  const [totalStats, setTotalStats] = useState<GameStats>({
+  // useRef로 실시간 통계 관리 (상태 업데이트 지연 문제 해결)
+  const statsRef = useRef<GameStats>({
     totalClicks: 0,
     wrongClicks: 0,
     correctClicks: 0,
@@ -79,7 +79,7 @@ const Round = () => {
   }, [round]);
 
   // 게임 종료 API 호출
-  const handleGameEnd = async (finalStats: GameStats) => {
+  const handleGameEnd = async () => {
     if (isSaved) {
       console.log('이미 저장된 게임입니다.');
       return;
@@ -95,13 +95,14 @@ const Round = () => {
     try {
       const payload = {
         sessionId,
-        score,
-        wrongCount: finalStats.wrongClicks,
+        score: statsRef.current.correctClicks,
+        wrongCount: statsRef.current.wrongClicks,
         reactionMsSum: 0,
-        roundCount: finalStats.successRounds,
-        successCount: score, // 점수 = 성공 클릭 수
+        roundCount: statsRef.current.successRounds,
+        successCount: statsRef.current.correctClicks,
       };
 
+      console.log('📊 전송할 최종 통계:', payload);
       const res = await endStarGame(payload);
       console.log('✅ 게임 종료 성공:', res);
       setIsSaved(true);
@@ -127,8 +128,11 @@ const Round = () => {
     setTimerRunning(false);
     setGameStarted(false);
 
-    // 즉시 저장
-    await handleGameEnd(totalStats);
+    // 현재 라운드는 실패이므로 이전 라운드까지만 성공
+    statsRef.current.successRounds = round - 1;
+
+    console.log('⏰ 시간 초과! 최종 통계:', statsRef.current);
+    await handleGameEnd();
     setIsModalOpen(true);
   };
 
@@ -141,6 +145,14 @@ const Round = () => {
       setProgress(100);
       setTimerRunning(false);
       setIsSaved(false);
+
+      // 통계 초기화
+      statsRef.current = {
+        totalClicks: 0,
+        wrongClicks: 0,
+        correctClicks: 0,
+        successRounds: 0,
+      };
 
       // 기존 세션 제거
       window.sessionStorage.removeItem('gameSessionId');
@@ -183,7 +195,7 @@ const Round = () => {
             type="star"
             score={score}
             onClose={() => {
-              window.sessionStorage.removeItem('gameSessionId'); // 세션 제거
+              window.sessionStorage.removeItem('gameSessionId');
               router.push('/main');
             }}
             onRetry={() => {
@@ -317,6 +329,7 @@ const Round = () => {
                 key={round}
                 round={round}
                 setScore={setScore}
+                statsRef={statsRef}
                 onMemoryEnd={() => {
                   const newTime = Math.max(5, 12.5 - round * 0.5);
                   setTimeLeft(newTime);
@@ -328,27 +341,23 @@ const Round = () => {
                   setGameStarted(false);
                   setOverlayStep(5);
 
-                  // 이번 라운드의 stats만 누적
-                  setTotalStats((prev) => ({
-                    totalClicks: prev.totalClicks + roundStats.totalClicks,
-                    wrongClicks: prev.wrongClicks + roundStats.wrongClicks,
-                    correctClicks: prev.correctClicks + roundStats.correctClicks,
-                    successRounds: prev.successRounds + roundStats.successRounds,
-                  }));
+                  // useRef에 직접 누적 (실시간 반영)
+                  statsRef.current.totalClicks += roundStats.totalClicks;
+                  statsRef.current.wrongClicks += roundStats.wrongClicks;
+                  statsRef.current.correctClicks += roundStats.correctClicks;
+                  statsRef.current.successRounds += 1;
 
-                  // 게임 클리어 시 즉시 저장
+                  console.log(`🎯 ${round}라운드 완료! 누적 통계:`, statsRef.current);
+
+                  // 10라운드 클리어 시 게임 종료
                   if (round >= 10) {
-                    const finalStats = {
-                      totalClicks: totalStats.totalClicks + roundStats.totalClicks,
-                      wrongClicks: totalStats.wrongClicks + roundStats.wrongClicks,
-                      correctClicks: totalStats.correctClicks + roundStats.correctClicks,
-                      successRounds: totalStats.successRounds + roundStats.successRounds,
-                    };
-                    await handleGameEnd(finalStats);
+                    console.log('🎉 게임 클리어! 최종 통계 저장 중...');
+                    await handleGameEnd();
                     setTimeout(() => setIsModalOpen(true), 1500);
                     return;
                   }
 
+                  // 다음 라운드로
                   setTimeout(() => {
                     setRound((r) => r + 1);
                   }, 2000);
@@ -367,7 +376,7 @@ const Round = () => {
           width={120}
           priority
           onClick={() => {
-            window.sessionStorage.removeItem('gameSessionId'); // 세션 제거
+            window.sessionStorage.removeItem('gameSessionId');
             router.push('/main');
           }}
         />
