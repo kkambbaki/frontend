@@ -156,7 +156,7 @@ const SigninBody = () => {
   return (
     <>
       <div className="flex flex-col">
-        <div className="flex flex-col gap-[54px] mb-[90px]">
+        <div className="flex flex-col gap-[20px] mb-[60px]">
           <Input
             placeholder="아이디 입력 (영문, 숫자 포함 4자리 이상)"
             value={username}
@@ -179,7 +179,7 @@ const SigninBody = () => {
         <BaseButton variant="lg" disabled={isLoginDisabled} onClick={handleLogin}>
           {isSubmitting ? '로그인 중' : '로그인'}
         </BaseButton>
-        <div className="mt-4 min-h-[32px] text-center text-xl font-bold">
+        <div className="text-center text-xl font-bold mb-[10px] mt-[10px]">
           {formMessage ? (
             <span className={isFormError ? 'text-[#CE2D2D]' : 'text-[#3D7F0B]'}>{formMessage}</span>
           ) : (
@@ -188,7 +188,7 @@ const SigninBody = () => {
         </div>
         <a
           href="/signup"
-          className="text-center underline font-bold decoration-1 underline-offset-7 text-xl text-[#D3770E] mt-[24px]"
+          className="text-center underline font-bold decoration-1 underline-offset-7 text-xl text-[#D3770E]"
         >
           회원가입
         </a>

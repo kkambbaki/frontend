@@ -455,7 +455,7 @@ const Round: React.FC<RoundProps> = ({ onBack }) => {
       </div>
 
       <motion.div
-        className="absolute bottom-[200px] left-1/2 -translate-x-1/2"
+        className="absolute bottom-[100px] left-1/2 -translate-x-1/2"
         animate={
           isCarMoving && failCount < 3
             ? {
@@ -478,7 +478,7 @@ const Round: React.FC<RoundProps> = ({ onBack }) => {
         }
       >
         <div className="relative">
-          <Image src={carImage} alt="자동차" width={440} height={360} priority />
+          <Image src={carImage} alt="자동차" width={410} height={350} priority />
           {isCarMoving && failCount < 3 && (
             <motion.div
               className="absolute -right-10 bottom-12"
@@ -500,7 +500,7 @@ const Round: React.FC<RoundProps> = ({ onBack }) => {
         </div>
       </motion.div>
 
-      <div className="absolute bottom-[120px] left-1/2 flex w-full max-w-[1200px] -translate-x-1/2 justify-between px-[100px]">
+      <div className="absolute bottom-[75px] left-1/2 flex w-full max-w-[1200px] -translate-x-1/2 justify-between px-[100px]">
         <PrimaryButton variant="lg" color="red" disabled={buttonsDisabled} onClick={handleRed}>
           멈춰!
         </PrimaryButton>
