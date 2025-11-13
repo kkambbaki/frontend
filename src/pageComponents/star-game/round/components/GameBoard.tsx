@@ -1,21 +1,15 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import star from '@/assets/images/star.png';
-
-export type GameStats = {
-  totalClicks: number;
-  wrongClicks: number;
-  correctClicks: number;
-  successRounds: number;
-};
 
 interface GameBoardProps {
   round: number;
   setScore: React.Dispatch<React.SetStateAction<number>>;
-  onRoundComplete: (stats: GameStats) => void;
+  onRoundComplete: () => void;
   onMemoryEnd: () => void;
+  onClickResult: (result: { isCorrect: boolean }) => void;
 }
 
 export default function GameBoard({
@@ -23,6 +17,7 @@ export default function GameBoard({
   setScore,
   onRoundComplete,
   onMemoryEnd,
+  onClickResult,
 }: GameBoardProps) {
   const [sequence, setSequence] = useState<number[]>([]);
   const [userInput, setUserInput] = useState<number[]>([]);
@@ -32,20 +27,7 @@ export default function GameBoard({
   const [wrongIndex, setWrongIndex] = useState<number | null>(null);
   const [shake, setShake] = useState(false);
 
-  // 라운드별 통계 객체
-  const roundStatsRef = useRef<GameStats>({
-    totalClicks: 0,
-    wrongClicks: 0,
-    correctClicks: 0,
-    successRounds: 1, // 이 라운드는 성공한 라운드임
-  });
-
-  const didStart = useRef(false);
-
   useEffect(() => {
-    if (didStart.current) return;
-    didStart.current = true;
-
     startRound();
   }, []);
 
@@ -72,15 +54,6 @@ export default function GameBoard({
     setSequence(seq);
     setUserInput([]);
     setPoppedStars([]);
-
-    // 라운드별 초기화
-    roundStatsRef.current = {
-      totalClicks: 0,
-      wrongClicks: 0,
-      correctClicks: 0,
-      successRounds: 1,
-    };
-
     playSequence(seq);
   }
 
@@ -89,14 +62,9 @@ export default function GameBoard({
 
     const expected = sequence[userInput.length];
 
-    // 클릭 즉시 라운드 통계 반영
-    roundStatsRef.current.totalClicks += 1;
-
+    // 클릭 한 번 발생 → 부모에 통계 전송
     if (index !== expected) {
-      // 틀린 클릭
-      roundStatsRef.current.wrongClicks += 1;
-
-      console.log('❌ 오답 클릭! 라운드 통계:', roundStatsRef.current);
+      onClickResult({ isCorrect: false });
 
       setWrongIndex(index);
       setShake(true);
@@ -108,17 +76,15 @@ export default function GameBoard({
     }
 
     // 정답 클릭
-    roundStatsRef.current.correctClicks += 1;
+    onClickResult({ isCorrect: true });
+
     setUserInput((prev) => [...prev, index]);
     setScore((prev) => prev + 1);
     setPoppedStars((prev) => [...prev, index]);
 
-    console.log('✅ 정답 클릭! 라운드 통계:', roundStatsRef.current);
-
-    // 라운드 전체 완료
+    // 시퀀스 전체 성공
     if (userInput.length + 1 === sequence.length) {
-      console.log('🎉 라운드 클리어! 최종 라운드 통계:', roundStatsRef.current);
-      setTimeout(() => onRoundComplete(roundStatsRef.current), 1000);
+      setTimeout(() => onRoundComplete(), 1000);
     }
   }
 
