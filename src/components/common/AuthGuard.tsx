@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 
-const publicPaths = ['/signin', '/signup'];
+const publicPaths = ['/signin', '/signup', '/'];
 
 interface AuthGuardProps {
   children: React.ReactNode;
