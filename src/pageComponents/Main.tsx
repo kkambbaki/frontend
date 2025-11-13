@@ -46,31 +46,27 @@ const Main = () => {
     }
 
     try {
-      // 1) PIN으로 레포트 생성 시작 요청
-      await getReportDetail(pin);
+      // 1) 상태 폴링 (여기에 생성 요청도 포함됨)
+      const status = await pollReportStatus();
 
-      // 2) 상태 폴링
-      const statusResult = await pollReportStatus();
-
-      if (statusResult.status !== 'completed') {
+      if (!status || status.status?.toLowerCase() !== 'completed') {
         alert('리포트 생성 중 오류가 발생했습니다.');
         return;
       }
 
-      // 3) 생성이 완료된 후에 상세 조회 호출
-      const detail: ReportDetailResponse = await getReportDetail(pin);
+      // 2) 상세 조회 (이 시점에서만 호출해야 정상 동작)
+      const detail = await getReportDetail(pin);
 
-      // 4) 데이터 저장
+      // 3) 세션스토리지 저장
       sessionStorage.setItem('reportData', JSON.stringify(detail));
 
       setIsPwModalOpen(false);
       router.push('/report');
     } catch (error) {
-      const err = error as AxiosError;
-      const data = err.response?.data as ReportErrorResponse | undefined;
+      const err = error as AxiosError<ReportErrorResponse>;
+      const data = err.response?.data;
 
       if (data?.errorCode === 'COMMON_422') {
-        // PIN 잘못됨
         setIsPwModalOpen(false);
         setPin('');
         setInvalidPinModal(true);
