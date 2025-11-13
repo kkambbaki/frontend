@@ -16,6 +16,7 @@ import {
   pollReportStatus,
   type ReportDetailResponse,
 } from '@/lib/api/report/reportApi';
+import { logout } from '@/lib/api/auth/logout';
 import { AxiosError } from 'axios';
 
 interface ReportErrorResponse {
@@ -135,6 +136,28 @@ const Main = () => {
             }}
           >
             교육적 효과
+          </SecondaryButton>
+          <SecondaryButton
+            variant="logout"
+            onClick={async () => {
+              try {
+                // 로그아웃 API 호출
+                await logout();
+              } catch (error) {
+                // 로그아웃 API 실패해도 로컬 세션 정리 및 리다이렉트는 진행
+              } finally {
+                // 세션 스토리지 정리
+                if (typeof window !== 'undefined') {
+                  window.sessionStorage.removeItem('accessToken');
+                  window.sessionStorage.removeItem('refreshToken');
+                  window.sessionStorage.removeItem('currentUser');
+                }
+                // 로그인 페이지로 이동
+                router.push('/signin');
+              }
+            }}
+          >
+            로그아웃
           </SecondaryButton>
         </div>
       </footer>
