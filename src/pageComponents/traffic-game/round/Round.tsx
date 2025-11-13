@@ -454,7 +454,7 @@ const Round: React.FC<RoundProps> = ({ onBack }) => {
         className="absolute top-[140px] right-0"
         src={lightState === 'green' ? trafficLightGreen : trafficLightRed}
         alt={`신호등_${lightState}`}
-        width={988}
+        width={788}
         height={150}
       />
       <div className="absolute top-[54px] left-1/2 -translate-x-1/2">
@@ -462,12 +462,12 @@ const Round: React.FC<RoundProps> = ({ onBack }) => {
       </div>
 
       <motion.div
-        className="absolute bottom-[100px] left-1/2 -translate-x-1/2"
+        className="absolute bottom-[110px] left-1/2 -translate-x-1/2"
         animate={
           isCarMoving && failCount < 3
             ? {
                 x: [0, 12, 0, -8, 0],
-                y: [0, -26, -8, -20, 0],
+                y: [0, -25, -5, -38, 0],
                 scale: [0.96, 0.88, 0.84, 0.88, 0.96],
                 transition: {
                   duration: currentRound.interval / 1000,

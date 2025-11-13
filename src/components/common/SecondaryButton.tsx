@@ -5,6 +5,7 @@ import Image from 'next/image';
 import lightbulbFill from '@/assets/icons/lightbulb-fill.svg';
 import pack from '@/assets/icons/pack.svg';
 import buttonCircle from '@/assets/icons/button-circle-sm.svg';
+import logout from '@/assets/icons/logout.svg';
 import { SecondaryButtonProps } from '@/types/common/button';
 import { cn } from '@/lib/utils';
 import { Share } from 'lucide-react';
@@ -38,6 +39,7 @@ const SecondaryButton = ({ children, variant = 'mailShare', onClick }: Secondary
         {variant === 'learningEffect' && (
           <Image src={lightbulbFill} alt="lightbulb fill" width={30.8} height={30.8} />
         )}
+        {variant === 'logout' && <Image src={logout} alt="logout" width={30} height={30} />}
         {variant === 'mailShare' && <Share size={20} color="#714821" />}
         <span className="relative z-10">{children}</span>
       </span>

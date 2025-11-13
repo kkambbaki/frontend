@@ -17,7 +17,7 @@ export interface PrimaryButtonProps {
 
 export interface SecondaryButtonProps {
   children: React.ReactNode;
-  variant: 'focusResult' | 'learningEffect' | 'mailShare';
+  variant: 'focusResult' | 'learningEffect' | 'mailShare' | 'logout';
   onClick?: () => void;
   className?: string;
 }
