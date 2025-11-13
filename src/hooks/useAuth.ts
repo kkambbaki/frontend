@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 
-const publicPaths = ['/signin', '/signup', '/on-boarding'];
+const publicPaths = ['/signin', '/signup', '/on-boarding', '/report'];
 
 export const useAuth = () => {
   const router = useRouter();
@@ -10,12 +10,6 @@ export const useAuth = () => {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-
-    const botToken = searchParams.get('BOT_TOKEN');
-
-    if (botToken) {
-      return;
-    }
 
     if (pathname && publicPaths.some((path) => pathname.startsWith(path))) {
       return;
