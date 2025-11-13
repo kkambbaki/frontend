@@ -12,15 +12,57 @@ import { Input } from '@/components/common/Input';
 import SecondaryButton from '@/components/common/SecondaryButton';
 import { useRouter } from 'next/navigation';
 
+import {
+  getReportDetail,
+  pollReportStatus,
+  type ReportDetailResponse,
+} from '@/lib/api/report/reportApi';
+
 const Main = () => {
   const [isPwModalOpen, setIsPwModalOpen] = useState(false);
   const [isEffectModalOpen, setIsEffectModalOpen] = useState(false);
   const [isFirst] = useState(false); // TODO: 게임 플레이 여부 수정 필요
+  const [pin, setPin] = useState('');
 
   const closePwModal = () => setIsPwModalOpen(false);
   const closeEffectModal = () => setIsEffectModalOpen(false);
 
   const router = useRouter();
+
+  const handleSubmitPin = async () => {
+    if (!pin.trim()) {
+      alert('PIN을 입력해주세요.');
+      return;
+    }
+
+    try {
+      // 1) 레포트 생성 요청
+      await getReportDetail(pin);
+
+      // 2) 폴링
+      const status = await pollReportStatus();
+
+      if (status.status.toUpperCase() === 'ERROR') {
+        alert('리포트 생성 중 오류가 발생했습니다.');
+        return;
+      }
+
+      // 3) 상세 조회
+      const detail: ReportDetailResponse = await getReportDetail(pin);
+
+      // 4) sessionStorage 저장
+      sessionStorage.setItem('reportData', JSON.stringify(detail));
+
+      // 🚀 5) 모달 닫기 (여기서 닫아야 정상 동작함)
+      setIsPwModalOpen(false);
+
+      // 🚀 6) report 페이지 이동
+      router.push('/report');
+    } catch (err) {
+      console.error(err);
+      alert('리포트를 가져오는 중 오류가 발생했습니다.');
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-[calc(100vh-40px)]">
@@ -79,6 +121,7 @@ const Main = () => {
         </div>
       </footer>
 
+      {/* PIN 입력 모달 */}
       {isPwModalOpen &&
         (isFirst ? (
           <Modal type="confirm" isCloseBtn={true} onConfirm={closePwModal} onClose={closePwModal}>
@@ -89,7 +132,12 @@ const Main = () => {
             </div>
           </Modal>
         ) : (
-          <Modal type="confirm" isCloseBtn={true} onConfirm={closePwModal} onClose={closePwModal}>
+          <Modal
+            type="confirm"
+            isCloseBtn={true}
+            onConfirm={handleSubmitPin}
+            onClose={closePwModal}
+          >
             <div className="flex flex-col items-center justify-center gap-5 h-[250px]">
               <p className="font-malrang text-5xl">비밀번호를 입력해주세요.</p>
               <p className="text-2xl font-extrabold text-modal-inner-text">
@@ -99,11 +147,14 @@ const Main = () => {
                 variant="password"
                 placeholder="비밀번호 입력"
                 className="w-full mx-auto !border-modal-inner-input-border"
+                value={pin}
+                onChange={(e) => setPin(e.target.value)}
               />
             </div>
           </Modal>
         ))}
 
+      {/* 교육적 효과 모달 */}
       {isEffectModalOpen && (
         <Modal
           size="large"
@@ -132,21 +183,16 @@ const Main = () => {
               <ModalTitle>꼬마 교통 지킴이</ModalTitle>
               <ul className="list-disc list-inside pl-2 text-2xl font-extrabold space-y-3">
                 <li>
-                  &lsquo;꼬마 신호등 지킴이&rsquo;의 핵심은 &lsquo;빨간불&rsquo;이 들어왔을 때, 이미
-                  자동적으로 형성된 &lsquo;움직이려는 반응(Go)&rsquo;을 의도적으로 억제하는 능력을
-                  훈련하는 것입니다.
+                  ‘꼬마 신호등 지킴이’의 핵심은 ‘빨간불’이 들어왔을 때, 이미 자동적으로 형성된
+                  ‘움직이려는 반응(Go)’을 의도적으로 억제하는 능력을 훈련하는 것입니다.
                 </li>
                 <li>
                   Go/No-Go 과제는 인지 심리학 및 신경 과학 분야에서 충동성과 반응 억제 조절을
-                  측정하는 표준 방법으로 널리 사용됩니다. ADHD 경향성이 있는 아동을 대상으로 한
-                  연구들에서는 반응 억제 조절이 어려운 집단에서 No-Go 과제 수행 시 특정 뇌파(Nogo P3
-                  사건유발전위)의 진폭이 감소하는 등, 충동성이 No-Go 실수율과 밀접하게 연관된다는
-                  결과가 보고되었습니다. Bohne et al., 2008; 선행 연구 메타분석 인용)
+                  측정하는 표준 방법으로 널리 사용됩니다.
                 </li>
                 <li>
-                  따라서 이 게임은 아동의 충동적인 행동 경향을 정량적인 실수율 데이터(빨간불 터치
-                  횟수)로 측정하고, 지속적인 훈련을 통해 실생활에서의 자기 통제력을 간접적으로
-                  향상시키는 데 효과를 기대할 수 있습니다.
+                  따라서 이 게임은 아동의 충동적인 행동 경향을 정량적인 실수율 데이터로 측정하고,
+                  지속적인 훈련을 통해 자기 통제력을 향상시키는 데 도움을 줄 수 있습니다.
                 </li>
               </ul>
             </div>
