@@ -13,7 +13,6 @@ export type GameStats = {
 
 interface GameBoardProps {
   round: number;
-  statsRef: React.RefObject<GameStats>;
   setScore: React.Dispatch<React.SetStateAction<number>>;
   onRoundComplete: (stats: GameStats) => void;
   onMemoryEnd: () => void;
@@ -22,7 +21,6 @@ interface GameBoardProps {
 export default function GameBoard({
   round,
   setScore,
-  statsRef,
   onRoundComplete,
   onMemoryEnd,
 }: GameBoardProps) {
@@ -34,7 +32,20 @@ export default function GameBoard({
   const [wrongIndex, setWrongIndex] = useState<number | null>(null);
   const [shake, setShake] = useState(false);
 
+  // 라운드별 통계 객체
+  const roundStatsRef = useRef<GameStats>({
+    totalClicks: 0,
+    wrongClicks: 0,
+    correctClicks: 0,
+    successRounds: 1, // 이 라운드는 성공한 라운드임
+  });
+
+  const didStart = useRef(false);
+
   useEffect(() => {
+    if (didStart.current) return;
+    didStart.current = true;
+
     startRound();
   }, []);
 
@@ -62,12 +73,12 @@ export default function GameBoard({
     setUserInput([]);
     setPoppedStars([]);
 
-    // 라운드 시작 시 통계 초기화
-    statsRef.current = {
+    // 라운드별 초기화
+    roundStatsRef.current = {
       totalClicks: 0,
       wrongClicks: 0,
       correctClicks: 0,
-      successRounds: 0,
+      successRounds: 1,
     };
 
     playSequence(seq);
@@ -78,14 +89,14 @@ export default function GameBoard({
 
     const expected = sequence[userInput.length];
 
-    // 클릭 즉시 통계에 반영
-    statsRef.current.totalClicks += 1;
+    // 클릭 즉시 라운드 통계 반영
+    roundStatsRef.current.totalClicks += 1;
 
     if (index !== expected) {
-      // 틀렸을 때
-      statsRef.current.wrongClicks += 1;
+      // 틀린 클릭
+      roundStatsRef.current.wrongClicks += 1;
 
-      console.log('❌ 오답 클릭! 현재 통계:', statsRef.current);
+      console.log('❌ 오답 클릭! 라운드 통계:', roundStatsRef.current);
 
       setWrongIndex(index);
       setShake(true);
@@ -97,17 +108,17 @@ export default function GameBoard({
     }
 
     // 정답 클릭
-    statsRef.current.correctClicks += 1;
+    roundStatsRef.current.correctClicks += 1;
     setUserInput((prev) => [...prev, index]);
     setScore((prev) => prev + 1);
     setPoppedStars((prev) => [...prev, index]);
 
-    console.log('✅ 정답 클릭! 현재 통계:', statsRef.current);
+    console.log('✅ 정답 클릭! 라운드 통계:', roundStatsRef.current);
 
-    // 모든 별 클릭 완료
+    // 라운드 전체 완료
     if (userInput.length + 1 === sequence.length) {
-      console.log('🎉 라운드 클리어! 최종 통계:', statsRef.current);
-      setTimeout(() => onRoundComplete(statsRef.current), 1000);
+      console.log('🎉 라운드 클리어! 최종 라운드 통계:', roundStatsRef.current);
+      setTimeout(() => onRoundComplete(roundStatsRef.current), 1000);
     }
   }
 

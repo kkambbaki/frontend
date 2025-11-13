@@ -66,13 +66,14 @@ const Report = () => {
           setLoading(false);
         }
       } else {
-        // 일반 사용자 → sessionStorage
         const stored = sessionStorage.getItem('reportData');
         if (!stored) {
           alert('리포트 데이터가 없습니다. 다시 PIN을 입력해주세요.');
           router.push('/main');
           return;
         }
+        sessionStorage.removeItem('reportData');
+
         setReport(JSON.parse(stored));
         setLoading(false);
       }

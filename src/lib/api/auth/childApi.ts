@@ -18,3 +18,9 @@ export const createChildUser = async (data: CreateChildRequest): Promise<CreateC
   const res = await api.post<CreateChildResponse>('/users/child/', data);
   return res.data;
 };
+
+// 자녀 확인 API
+export const checkChildUser = async (): Promise<CreateChildResponse> => {
+  const res = await api.get<CreateChildResponse>('/users/child/');
+  return res.data;
+};

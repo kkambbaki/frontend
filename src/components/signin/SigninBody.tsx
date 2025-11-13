@@ -7,6 +7,7 @@ import BaseButton from '../common/BaseButton';
 import Toast from '../common/Toast';
 import { signin } from '@/lib/api/auth/signin';
 import { PASSWORD_VALIDATION_MESSAGE, USERNAME_VALIDATION_MESSAGE } from '@/lib/constants/auth';
+import { checkChildUser } from '@/lib/api/auth/childApi';
 
 type ToastVariant = 'success' | 'error';
 
@@ -122,15 +123,14 @@ const SigninBody = () => {
       hasError = true;
     }
 
-    if (hasError) {
-      return;
-    }
+    if (hasError) return;
 
     setIsSubmitting(true);
     setFormMessage('');
     setIsFormError(false);
 
     try {
+      // 🔐 로그인
       const response = await signin({
         username: username.trim(),
         password,
@@ -140,6 +140,15 @@ const SigninBody = () => {
         window.sessionStorage.setItem('accessToken', response.access);
         window.sessionStorage.setItem('refreshToken', response.refresh);
         window.sessionStorage.setItem('currentUser', response.user);
+      }
+
+      // 👶 로그인 성공 후 → 자녀 정보 확인 API 호출
+      const child = await checkChildUser();
+
+      // 🎯 child.name이 비어있으면 온보딩으로 이동
+      if (!child.name || child.name.trim() === '') {
+        router.push('/on-boarding');
+        return;
       }
 
       router.push('/main');

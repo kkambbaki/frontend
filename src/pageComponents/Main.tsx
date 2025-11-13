@@ -11,16 +11,25 @@ import ModalTitle from '@/components/common/ModalTitle';
 import { Input } from '@/components/common/Input';
 import SecondaryButton from '@/components/common/SecondaryButton';
 import { useRouter } from 'next/navigation';
-
 import {
   getReportDetail,
   pollReportStatus,
   type ReportDetailResponse,
 } from '@/lib/api/report/reportApi';
+import { AxiosError } from 'axios';
+
+interface ReportErrorResponse {
+  status?: string;
+  errorCode?: string;
+  message?: string;
+  description?: string;
+  details?: unknown;
+}
 
 const Main = () => {
   const [isPwModalOpen, setIsPwModalOpen] = useState(false);
   const [isEffectModalOpen, setIsEffectModalOpen] = useState(false);
+  const [invalidPinModal, setInvalidPinModal] = useState(false);
   const [isFirst] = useState(false); // TODO: 게임 플레이 여부 수정 필요
   const [pin, setPin] = useState('');
 
@@ -50,16 +59,25 @@ const Main = () => {
       // 3) 상세 조회
       const detail: ReportDetailResponse = await getReportDetail(pin);
 
-      // 4) sessionStorage 저장
+      // 4) 저장
       sessionStorage.setItem('reportData', JSON.stringify(detail));
 
-      // 🚀 5) 모달 닫기 (여기서 닫아야 정상 동작함)
       setIsPwModalOpen(false);
 
-      // 🚀 6) report 페이지 이동
       router.push('/report');
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      const err = error as AxiosError;
+
+      const data = err.response?.data as ReportErrorResponse | undefined;
+      console.log(data?.errorCode);
+
+      if (data?.errorCode === 'COMMON_422') {
+        setIsPwModalOpen(false);
+        setPin('');
+        setInvalidPinModal(true);
+        return;
+      }
+
       alert('리포트를 가져오는 중 오류가 발생했습니다.');
     }
   };
@@ -120,6 +138,19 @@ const Main = () => {
           </SecondaryButton>
         </div>
       </footer>
+
+      {invalidPinModal && (
+        <Modal
+          type="confirm"
+          isCloseBtn={true}
+          onConfirm={() => setInvalidPinModal(false)}
+          onClose={() => setInvalidPinModal(false)}
+        >
+          <div className="flex items-center justify-center h-full">
+            <p className="font-malrang text-5xl text-center">PIN 번호가 알맞지 않습니다.</p>
+          </div>
+        </Modal>
+      )}
 
       {/* PIN 입력 모달 */}
       {isPwModalOpen &&

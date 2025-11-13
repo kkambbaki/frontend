@@ -105,6 +105,7 @@ const Round = () => {
       console.log('📊 전송할 최종 통계:', payload);
       const res = await endStarGame(payload);
       console.log('✅ 게임 종료 성공:', res);
+      window.sessionStorage.removeItem('gameSessionId'); // sessionId 제거
       setIsSaved(true);
     } catch (error) {
       console.error('❌ 게임 종료 실패:', error);
@@ -329,7 +330,6 @@ const Round = () => {
                 key={round}
                 round={round}
                 setScore={setScore}
-                statsRef={statsRef}
                 onMemoryEnd={() => {
                   const newTime = Math.max(5, 12.5 - round * 0.5);
                   setTimeLeft(newTime);
@@ -341,15 +341,14 @@ const Round = () => {
                   setGameStarted(false);
                   setOverlayStep(5);
 
-                  // useRef에 직접 누적 (실시간 반영)
+                  // 🔥 라운드 통계 누적
                   statsRef.current.totalClicks += roundStats.totalClicks;
                   statsRef.current.wrongClicks += roundStats.wrongClicks;
                   statsRef.current.correctClicks += roundStats.correctClicks;
-                  statsRef.current.successRounds += 1;
+                  statsRef.current.successRounds += roundStats.successRounds;
 
                   console.log(`🎯 ${round}라운드 완료! 누적 통계:`, statsRef.current);
 
-                  // 10라운드 클리어 시 게임 종료
                   if (round >= 10) {
                     console.log('🎉 게임 클리어! 최종 통계 저장 중...');
                     await handleGameEnd();
@@ -357,7 +356,6 @@ const Round = () => {
                     return;
                   }
 
-                  // 다음 라운드로
                   setTimeout(() => {
                     setRound((r) => r + 1);
                   }, 2000);
