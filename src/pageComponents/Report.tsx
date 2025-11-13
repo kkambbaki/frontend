@@ -84,6 +84,8 @@ const Report = () => {
   }, [BOT_TOKEN, router]);
 
   const handleSendEmail = async () => {
+    if (sending) return; // 중복 클릭 방지
+
     if (!email.trim()) {
       alert('이메일 주소를 입력해주세요.');
       return;
