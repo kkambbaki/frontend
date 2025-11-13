@@ -50,11 +50,11 @@ const Report = () => {
     }
   };
 
-  // 🔥 BOT_TOKEN 모드 / 일반 모드 구분
+  // BOT_TOKEN 모드 / 일반 모드 구분
   useEffect(() => {
     const fetchData = async () => {
       if (BOT_TOKEN) {
-        // BOT_TOKEN 있을 때 → 서버에서 직접 상세 조회
+        // BOT_TOKEN 모드일 때는 sessionStorage 검사 금지!!
         try {
           const detail = await getReportDetail(null, BOT_TOKEN);
           setReport(detail);
@@ -65,24 +65,24 @@ const Report = () => {
         } finally {
           setLoading(false);
         }
-      } else {
-        const stored = sessionStorage.getItem('reportData');
-        if (!stored) {
-          alert('리포트 데이터가 없습니다. 다시 PIN을 입력해주세요.');
-          router.push('/main');
-          return;
-        }
-        sessionStorage.removeItem('reportData');
-
-        setReport(JSON.parse(stored));
-        setLoading(false);
+        return;
       }
+
+      // 🔥 일반 사용자 모드
+      const stored = sessionStorage.getItem('reportData');
+      if (!stored) {
+        alert('리포트 데이터가 없습니다. 다시 PIN을 입력해주세요.');
+        router.push('/main');
+        return;
+      }
+
+      setReport(JSON.parse(stored));
+      setLoading(false);
     };
 
     fetchData();
   }, [BOT_TOKEN, router]);
 
-  // 📧 이메일 전송 — BOT_TOKEN 사용 X
   const handleSendEmail = async () => {
     if (!email.trim()) {
       alert('이메일 주소를 입력해주세요.');
@@ -91,7 +91,7 @@ const Report = () => {
 
     try {
       setSending(true);
-      await sendReportEmail(email); // ❌ BOT_TOKEN 안 넣음
+      await sendReportEmail(email);
       alert('리포트 PDF가 입력하신 이메일로 전송되었습니다!');
       setShareClicked(false);
       setEmail('');
