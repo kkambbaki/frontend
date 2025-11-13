@@ -64,7 +64,7 @@ export const getReportDetail = async (
 };
 
 export interface ReportStatusResponse {
-  status: 'generating' | 'completed' | 'error';
+  status: 'generating' | 'completed' | 'error' | 'no_games_played';
   reportId?: number;
   message?: string;
 }
@@ -85,10 +85,20 @@ export const pollReportStatus = async (
 
     const data = await getReportStatus();
 
-    console.log(`📡 [pollReportStatus] (${attempt}) 상태: ${data.status}`);
-
-    if (data.status === 'completed' || data.status === 'error') {
+    // 완료 or 에러 or 플레이 안 함 → 즉시 종료
+    if (
+      data.status === 'completed' ||
+      data.status === 'error' ||
+      data.status === 'no_games_played'
+    ) {
       return data;
+    }
+
+    // generating이면 계속 기다리기 (폴링 지속)
+    if (data.status === 'generating') {
+      console.log(`⏳ 폴링 중... (${attempt})`);
+      await new Promise((res) => setTimeout(res, intervalMs));
+      continue;
     }
 
     await new Promise((res) => setTimeout(res, intervalMs));
