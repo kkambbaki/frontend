@@ -10,13 +10,17 @@ import SecondaryButton from '@/components/common/SecondaryButton';
 import Modal from '@/components/common/Modal';
 import { Input } from '@/components/common/Input';
 import cancelImage from '@/assets/icons/cancel.svg';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
-import { sendReportEmail } from '@/lib/api/report/reportApi';
+import { sendReportEmail, getReportDetail } from '@/lib/api/report/reportApi';
 import type { ReportDetailResponse, GameReport } from '@/lib/api/report/reportApi';
 
 const Report = () => {
   const router = useRouter();
+  const params = useSearchParams();
+
+  // 🔥 URL에 BOT_TOKEN이 있는 경우 (PDF 크롤러)
+  const BOT_TOKEN = params.get('BOT_TOKEN');
 
   const [report, setReport] = useState<ReportDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -46,19 +50,38 @@ const Report = () => {
     }
   };
 
+  // 🔥 BOT_TOKEN 모드 / 일반 모드 구분
   useEffect(() => {
-    const stored = sessionStorage.getItem('reportData');
+    const fetchData = async () => {
+      if (BOT_TOKEN) {
+        // BOT_TOKEN 있을 때 → 서버에서 직접 상세 조회
+        try {
+          const detail = await getReportDetail(null, BOT_TOKEN);
+          setReport(detail);
+        } catch (e) {
+          alert('BOT_TOKEN 인증 오류');
+          router.push('/main');
+          return;
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        // 일반 사용자 → sessionStorage
+        const stored = sessionStorage.getItem('reportData');
+        if (!stored) {
+          alert('리포트 데이터가 없습니다. 다시 PIN을 입력해주세요.');
+          router.push('/main');
+          return;
+        }
+        setReport(JSON.parse(stored));
+        setLoading(false);
+      }
+    };
 
-    if (!stored) {
-      alert('리포트 데이터가 없습니다. 다시 PIN을 입력해주세요.');
-      router.push('/main');
-      return;
-    }
+    fetchData();
+  }, [BOT_TOKEN, router]);
 
-    setReport(JSON.parse(stored));
-    setLoading(false);
-  }, [router]);
-
+  // 📧 이메일 전송 — BOT_TOKEN 사용 X
   const handleSendEmail = async () => {
     if (!email.trim()) {
       alert('이메일 주소를 입력해주세요.');
@@ -67,7 +90,7 @@ const Report = () => {
 
     try {
       setSending(true);
-      await sendReportEmail(email);
+      await sendReportEmail(email); // ❌ BOT_TOKEN 안 넣음
       alert('리포트 PDF가 입력하신 이메일로 전송되었습니다!');
       setShareClicked(false);
       setEmail('');
@@ -88,16 +111,24 @@ const Report = () => {
 
   if (!report) return null;
 
+  // 🔥 BOT_TOKEN 모드일 때 UI 비활성화
+  const hideShareButton = Boolean(BOT_TOKEN);
+  const hideCloseButton = Boolean(BOT_TOKEN);
+
   return (
     <div className="flex flex-col min-h-[calc(100vh-40px)] overflow-y-auto scrollbar px-32 max-md:px-20 py-10">
       <Logo className="absolute top-14 left-8" />
-      <Image
-        src={cancelImage}
-        alt="cancel-button"
-        className="absolute top-14 right-8 cursor-pointer hover:scale-105 transition-transform"
-        width={60}
-        onClick={() => router.push('/main')}
-      />
+
+      {/* ❌ BOT_TOKEN 모드에서는 닫기 버튼 표시 X */}
+      {!hideCloseButton && (
+        <Image
+          src={cancelImage}
+          alt="cancel-button"
+          className="absolute top-14 right-8 cursor-pointer hover:scale-105 transition-transform"
+          width={60}
+          onClick={() => router.push('/main')}
+        />
+      )}
 
       {/* Title */}
       <div className="flex-grow pt-8 font-extrabold flex flex-col gap-12">
@@ -198,15 +229,18 @@ const Report = () => {
           </div>
         ))}
 
-        <div className="flex justify-center">
-          <SecondaryButton variant="mailShare" onClick={() => setShareClicked(true)}>
-            메일로 공유하기
-          </SecondaryButton>
-        </div>
+        {/* 📧 메일 공유 버튼 — BOT_TOKEN 모드에서는 숨김 */}
+        {!hideShareButton && (
+          <div className="flex justify-center">
+            <SecondaryButton variant="mailShare" onClick={() => setShareClicked(true)}>
+              메일로 공유하기
+            </SecondaryButton>
+          </div>
+        )}
       </div>
 
-      {/* 📧 메일 공유 모달 */}
-      {shareClicked && (
+      {/* 📧 메일 공유 모달 (BOT_TOKEN 모드에서는 숨김) */}
+      {shareClicked && !hideShareButton && (
         <Modal
           type="step"
           isCloseBtn

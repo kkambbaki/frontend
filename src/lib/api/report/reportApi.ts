@@ -50,8 +50,16 @@ export interface ReportDetailResponse {
   updatedAt: string;
 }
 
-export const getReportDetail = async (pin: string) => {
-  const { data } = await api.post('/reports/', { pin });
+export const getReportDetail = async (
+  pin?: string | null,
+  botToken?: string | null
+): Promise<ReportDetailResponse> => {
+  const headers = botToken ? { 'X-BOT-TOKEN': botToken } : {};
+
+  const body = pin ? { pin } : {};
+
+  const { data } = await api.post('/reports/', body, { headers });
+
   return data;
 };
 
