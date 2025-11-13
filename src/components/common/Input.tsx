@@ -186,17 +186,18 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         </div>
 
         {/* 메시지 영역 */}
-        <p
-          className={cn(
-            'ml-4 mt-1 min-h-[20px] text-sm leading-none font-bold',
-            !messageText && 'font-medium text-transparent',
-            messageVariant === 'error' && 'text-error-text',
-            messageVariant === 'success' && 'text-[#3D7F0B]',
-            messageVariant === 'default' && !!messageText && 'text-placeholder-text'
-          )}
-        >
-          {messageText}
-        </p>
+        {messageText && (
+          <p
+            className={cn(
+              'ml-4 mt-1 text-sm leading-none font-bold',
+              messageVariant === 'error' && 'text-error-text',
+              messageVariant === 'success' && 'text-[#3D7F0B]',
+              messageVariant === 'default' && 'text-placeholder-text'
+            )}
+          >
+            {messageText}
+          </p>
+        )}
       </div>
     );
   }

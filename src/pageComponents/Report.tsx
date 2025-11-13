@@ -254,13 +254,25 @@ const Report = () => {
               아이의 집중력 분석 레포트를 메일로 받아보세요.
             </p>
             <div className="flex items-center gap-7 w-full px-5">
-              <p className="px-6 py-[19px] bg-modal-inner-input-border text-4xl font-extrabold rounded-[20px] whitespace-nowrap">
+              <p
+                className="h-[80px] flex items-center px-6 bg-modal-inner-input-border 
+                text-4xl font-extrabold rounded-[20px] whitespace-nowrap"
+              >
                 E-MAIL
               </p>
+
               <Input
                 variant="default"
                 placeholder="abc@gmail.com"
-                className="w-full mx-auto !border-modal-inner-input-border !text-3xl"
+                className="
+                  h-[80px] 
+                  w-full 
+                  mx-auto 
+                  !border-modal-inner-input-border 
+                  !text-3xl 
+                  !py-0 
+                  !leading-[80px]
+                "
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
