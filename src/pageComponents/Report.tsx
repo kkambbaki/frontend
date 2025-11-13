@@ -264,7 +264,15 @@ const Report = () => {
               <Input
                 variant="default"
                 placeholder="abc@gmail.com"
-                className="h-[80px] w-full mx-auto !border-modal-inner-input-border !text-3xl"
+                className="
+                  h-[80px] 
+                  w-full 
+                  mx-auto 
+                  !border-modal-inner-input-border 
+                  !text-3xl 
+                  !py-0 
+                  !leading-[80px]
+                "
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
