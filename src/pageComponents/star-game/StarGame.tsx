@@ -82,7 +82,7 @@ const StarGame = () => {
         />
       </div>
 
-      <div className="w-full px-29 absolute bottom-[100px]">
+      <div className="w-full px-29 absolute bottom-[70px]">
         <Description title="별똥이" onClickNext={handleNext}>
           {descriptions[state]}
         </Description>

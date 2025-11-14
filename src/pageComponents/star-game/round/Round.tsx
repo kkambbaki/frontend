@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import starGameBackgroundImage from '@/assets/images/star-game-backgroundimage.png';
 import starGameProgressBarImage from '@/assets/images/progress-bar.png';
 import backButton from '@/assets/icons/back.svg';
@@ -23,6 +23,19 @@ type GameStats = {
 
 const Round = () => {
   const router = useRouter();
+
+  // 둥근 테두리를 위한 레이어 생성 (버튼과 동일한 방식)
+  const borderLayers = useMemo(() => {
+    return [...Array(32)].map((_, i) => {
+      const angle = (i * Math.PI * 2) / 32;
+      const x = Math.cos(angle) * 5;
+      const y = Math.sin(angle) * 5;
+      return {
+        x: x.toFixed(5),
+        y: y.toFixed(5),
+      };
+    });
+  }, []);
 
   const [overlayStep, setOverlayStep] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
@@ -200,21 +213,50 @@ const Round = () => {
             className="absolute inset-0 flex flex-col items-center justify-center font-malrang z-[90] bg-black/60"
           >
             {[0, 1, 2, 5].includes(overlayStep) && (
-              <motion.p
+              <motion.span
                 key={overlayText}
                 initial={{ scale: 0.7, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 0.6 }}
-                className="text-[128px] font-extrabold"
+                className="font-nanum text-[128px] font-extrabold relative inline-block"
                 style={{
-                  background: `linear-gradient(to bottom, ${overlayColor}, #994802)`,
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  WebkitTextStroke: '7px #994802',
+                  position: 'relative',
+                  display: 'inline-block',
                 }}
               >
-                {overlayText}
-              </motion.p>
+                {/* 보더 효과를 위한 여러 레이어 */}
+                {borderLayers.map((layer, i) => {
+                  const scale = 7 / 5; // 7px 테두리를 위해 스케일 조정
+                  return (
+                    <span
+                      key={i}
+                      style={{
+                        position: 'absolute',
+                        top: '0',
+                        left: '0',
+                        color: '#994802',
+                        transform: `translate(${(parseFloat(layer.x) * scale).toFixed(5)}px, ${(parseFloat(layer.y) * scale).toFixed(5)}px)`,
+                        zIndex: 1,
+                        WebkitTextStrokeWidth: 4,
+                      }}
+                    >
+                      {overlayText}
+                    </span>
+                  );
+                })}
+                {/* 메인 텍스트 레이어 */}
+                <span
+                  style={{
+                    position: 'relative',
+                    background: `linear-gradient(to bottom, ${overlayColor}, #994802)`,
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    zIndex: 2,
+                  }}
+                >
+                  {overlayText}
+                </span>
+              </motion.span>
             )}
 
             {overlayStep === 3 && (
@@ -282,15 +324,41 @@ const Round = () => {
 
       <div className="text-[#F0F0F0] font-malrang absolute flex items-center gap-5 right-10 top-10 z-[60]">
         <p className="text-[40px]">점수</p>
-        <p
-          className="text-[64px] font-extrabold"
+        <span
+          className="font-sdsamliphopangche text-[64px] relative inline-block"
           style={{
-            WebkitTextStroke: '4px #9F4A11',
-            WebkitTextFillColor: '#FFC738',
+            position: 'relative',
+            display: 'inline-block',
           }}
         >
-          {score}
-        </p>
+          {/* 보더 효과를 위한 여러 레이어 */}
+          {borderLayers.map((layer, i) => (
+            <span
+              key={i}
+              style={{
+                position: 'absolute',
+                top: '0',
+                left: '0',
+                color: '#9F4A11',
+                transform: `translate(${layer.x}px, ${layer.y}px)`,
+                zIndex: 1,
+                WebkitTextStrokeWidth: 3,
+              }}
+            >
+              {score}
+            </span>
+          ))}
+          {/* 메인 텍스트 레이어 */}
+          <span
+            style={{
+              position: 'relative',
+              color: '#FFC738',
+              zIndex: 2,
+            }}
+          >
+            {score}
+          </span>
+        </span>
       </div>
 
       <div className="absolute left-1/2 -translate-x-1/2 top-7 z-[50]">

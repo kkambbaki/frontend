@@ -78,6 +78,14 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: 'SDSamliphopangcheBasic';
+  src: url('../assets/fonts/SDSamliphopangcheBasic.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme {
   --color-background-header: #ffe3a7;
   --color-main-text: #4d2d07;
@@ -113,6 +121,7 @@
 @theme {
   --font-malrang: 'GeekbleMalrangiche', sans-serif;
   --font-nanum: 'NanumSquareRoundExtraBold', sans-serif;
+  --font-sdsamliphopangche: 'SDSamliphopangcheBasic', sans-serif;
   --clip-button-curve: polygon(
     0 0,
     100% 0,

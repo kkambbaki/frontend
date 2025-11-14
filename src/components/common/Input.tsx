@@ -151,6 +151,18 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             </div>
           );
 
+        case 'password':
+          return (
+            <input
+              ref={ref}
+              {...props}
+              className={cn(
+                'flex-1 bg-transparent outline-none text-input-text placeholder:text-placeholder-text text-right',
+                error && 'text-error-text placeholder:text-error-text'
+              )}
+            />
+          );
+
         default:
           return (
             <input
