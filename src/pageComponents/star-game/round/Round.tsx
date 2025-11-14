@@ -231,21 +231,50 @@ const Round = () => {
           >
             {/* ROUND~CLEAR 텍스트 */}
             {[0, 1, 2, 5].includes(overlayStep) && (
-              <motion.p
+              <motion.span
                 key={overlayText}
                 initial={{ scale: 0.7, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ duration: 0.6 }}
-                className="text-[128px] font-extrabold"
+                className="font-nanum text-[128px] font-extrabold relative inline-block"
                 style={{
-                  background: `linear-gradient(to bottom, ${overlayColor}, #994802)`,
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  WebkitTextStroke: '7px #994802',
+                  position: 'relative',
+                  display: 'inline-block',
                 }}
               >
-                {overlayText}
-              </motion.p>
+                {/* 보더 효과를 위한 여러 레이어 */}
+                {borderLayers.map((layer, i) => {
+                  const scale = 7 / 5; // 7px 테두리를 위해 스케일 조정
+                  return (
+                    <span
+                      key={i}
+                      style={{
+                        position: 'absolute',
+                        top: '0',
+                        left: '0',
+                        color: '#994802',
+                        transform: `translate(${(parseFloat(layer.x) * scale).toFixed(5)}px, ${(parseFloat(layer.y) * scale).toFixed(5)}px)`,
+                        zIndex: 1,
+                        WebkitTextStrokeWidth: 4,
+                      }}
+                    >
+                      {overlayText}
+                    </span>
+                  );
+                })}
+                {/* 메인 텍스트 레이어 */}
+                <span
+                  style={{
+                    position: 'relative',
+                    background: `linear-gradient(to bottom, ${overlayColor}, #994802)`,
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    zIndex: 2,
+                  }}
+                >
+                  {overlayText}
+                </span>
+              </motion.span>
             )}
 
             {/* 인지단계 안내 (손가락 + 텍스트 유지) */}

@@ -409,19 +409,50 @@ const Round: React.FC<RoundProps> = ({ onBack }) => {
             transition={{ duration: 0.5 }}
             className="absolute inset-0 z-[200] flex items-center justify-center bg-black/40"
           >
-            <p
-              className="font-malrangiche text-[120px]"
+            <span
+              className="font-nanum text-[120px] relative inline-block"
               style={{
-                background: 'linear-gradient(180deg, #FFD359 0%, #FF9F1A 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                WebkitTextStroke: '8px #7F4B1F',
+                position: 'relative',
+                display: 'inline-block',
               }}
             >
-              {overlayStep === 'round' && `${currentRound.round} 라운드`}
-              {overlayStep === 'ready' && '준비'}
-              {overlayStep === 'start' && '시작!'}
-            </p>
+              {/* 보더 효과를 위한 여러 레이어 */}
+              {borderLayers.map((layer, i) => {
+                const scale = 8 / 5; // 8px 테두리를 위해 스케일 조정
+                return (
+                  <span
+                    key={i}
+                    style={{
+                      position: 'absolute',
+                      top: '0',
+                      left: '0',
+                      color: '#7F4B1F',
+                      transform: `translate(${(parseFloat(layer.x) * scale).toFixed(5)}px, ${(parseFloat(layer.y) * scale).toFixed(5)}px)`,
+                      zIndex: 1,
+                      WebkitTextStrokeWidth: 4,
+                    }}
+                  >
+                    {overlayStep === 'round' && `${currentRound.round} 라운드`}
+                    {overlayStep === 'ready' && '준비'}
+                    {overlayStep === 'start' && '시작!'}
+                  </span>
+                );
+              })}
+              {/* 메인 텍스트 레이어 */}
+              <span
+                style={{
+                  position: 'relative',
+                  background: 'linear-gradient(180deg, #FFD359 0%, #FF9F1A 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  zIndex: 2,
+                }}
+              >
+                {overlayStep === 'round' && `${currentRound.round} 라운드`}
+                {overlayStep === 'ready' && '준비'}
+                {overlayStep === 'start' && '시작!'}
+              </span>
+            </span>
           </motion.div>
         )}
       </AnimatePresence>
