@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import starGameBackgroundImage from '@/assets/images/star-game-backgroundimage.png';
 import starGameProgressBarImage from '@/assets/images/progress-bar.png';
 import backButton from '@/assets/icons/back.svg';
@@ -16,6 +16,19 @@ import { endStarGame, startStarGame } from '@/lib/api/game/star/starApi';
 
 const Round = () => {
   const router = useRouter();
+
+  // 둥근 테두리를 위한 레이어 생성 (버튼과 동일한 방식)
+  const borderLayers = useMemo(() => {
+    return [...Array(32)].map((_, i) => {
+      const angle = (i * Math.PI * 2) / 32;
+      const x = Math.cos(angle) * 5;
+      const y = Math.sin(angle) * 5;
+      return {
+        x: x.toFixed(5),
+        y: y.toFixed(5),
+      };
+    });
+  }, []);
 
   const [overlayStep, setOverlayStep] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
@@ -300,15 +313,41 @@ const Round = () => {
       {/* 점수 표시 */}
       <div className="text-[#F0F0F0] font-malrang absolute flex items-center gap-5 right-10 top-10 z-[60]">
         <p className="text-[40px]">점수</p>
-        <p
-          className="text-[64px] font-extrabold"
+        <span
+          className="font-sdsamliphopangche text-[64px] relative inline-block"
           style={{
-            WebkitTextStroke: '4px #9F4A11',
-            WebkitTextFillColor: '#FFC738',
+            position: 'relative',
+            display: 'inline-block',
           }}
         >
-          {score}
-        </p>
+          {/* 보더 효과를 위한 여러 레이어 */}
+          {borderLayers.map((layer, i) => (
+            <span
+              key={i}
+              style={{
+                position: 'absolute',
+                top: '0',
+                left: '0',
+                color: '#9F4A11',
+                transform: `translate(${layer.x}px, ${layer.y}px)`,
+                zIndex: 1,
+                WebkitTextStrokeWidth: 3,
+              }}
+            >
+              {score}
+            </span>
+          ))}
+          {/* 메인 텍스트 레이어 */}
+          <span
+            style={{
+              position: 'relative',
+              color: '#FFC738',
+              zIndex: 2,
+            }}
+          >
+            {score}
+          </span>
+        </span>
       </div>
 
       {/* 게임 메인 영역 */}

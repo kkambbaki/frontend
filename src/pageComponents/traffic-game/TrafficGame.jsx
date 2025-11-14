@@ -32,7 +32,7 @@ const TrafficGame = () => {
           priority
           onClick={() => router.replace('/main')}
         />
-        <div className="absolute bottom-[100px] left-1/2 w-full -translate-x-1/2 px-29">
+        <div className="absolute bottom-[70px] left-1/2 w-full -translate-x-1/2 px-29">
           <Description title="신호등" onClickNext={handleNext} className="w-full">
             {currentSentence}
           </Description>

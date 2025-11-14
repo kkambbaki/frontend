@@ -42,6 +42,20 @@ interface RoundDetail {
 
 const Round: React.FC<RoundProps> = ({ onBack }) => {
   const router = useRouter();
+
+  // 둥근 테두리를 위한 레이어 생성 (버튼과 동일한 방식)
+  const borderLayers = useMemo(() => {
+    return [...Array(32)].map((_, i) => {
+      const angle = (i * Math.PI * 2) / 32;
+      const x = Math.cos(angle) * 5;
+      const y = Math.sin(angle) * 5;
+      return {
+        x: x.toFixed(5),
+        y: y.toFixed(5),
+      };
+    });
+  }, []);
+
   const [roundIndex, setRoundIndex] = useState(0);
   const [overlayStep, setOverlayStep] = useState<'round' | 'ready' | 'start' | 'none'>('round');
   const [score, setScore] = useState(0);
@@ -426,15 +440,41 @@ const Round: React.FC<RoundProps> = ({ onBack }) => {
 
       <div className="absolute top-[64px] right-[100px] flex items-center gap-[26px]">
         <p className="font-malrangiche text-[30px] text-[#333333]">점수</p>
-        <p
-          className="font-nanum text-[64px] font-bold text-[#FFC738]"
+        <span
+          className="font-sdsamliphopangche text-[64px] relative inline-block"
           style={{
-            WebkitTextStrokeWidth: '4px',
-            WebkitTextStrokeColor: '#7F4F1A',
+            position: 'relative',
+            display: 'inline-block',
           }}
         >
-          {score}
-        </p>
+          {/* 보더 효과를 위한 여러 레이어 */}
+          {borderLayers.map((layer, i) => (
+            <span
+              key={i}
+              style={{
+                position: 'absolute',
+                top: '0',
+                left: '0',
+                color: '#7F4F1A',
+                transform: `translate(${layer.x}px, ${layer.y}px)`,
+                zIndex: 1,
+                WebkitTextStrokeWidth: 3,
+              }}
+            >
+              {score}
+            </span>
+          ))}
+          {/* 메인 텍스트 레이어 */}
+          <span
+            style={{
+              position: 'relative',
+              color: '#FFC738',
+              zIndex: 2,
+            }}
+          >
+            {score}
+          </span>
+        </span>
       </div>
 
       <div className="absolute top-[100px] left-[250px] flex items-center gap-[18px]">
