@@ -6,7 +6,7 @@ import Round from '@/pageComponents/traffic-game/round/Round';
 
 const TrafficRoundPage = () => {
   const router = useRouter();
-  return <Round onBack={() => router.back()} />;
+  return <Round onBack={() => router.replace('/main')} />;
 };
 
 export default TrafficRoundPage;

@@ -24,12 +24,13 @@ const TrafficGame = () => {
       />
       <div className="relative z-10 flex min-h-screen w-full flex-col items-center justify-center">
         <Image
-          className="absolute left-[80px] top-[50px] z-20 transition-transform hover:scale-105 active:scale-95"
+          className="absolute left-[80px] top-[50px] z-20 transition-transform hover:scale-105 active:scale-95 cursor-pointer"
           src={backImg}
           alt="뒤로가기"
           width={120}
           height={120}
           priority
+          onClick={() => router.replace('/main')}
         />
         <div className="absolute bottom-[100px] left-1/2 w-full -translate-x-1/2 px-29">
           <Description title="신호등" onClickNext={handleNext} className="w-full">
