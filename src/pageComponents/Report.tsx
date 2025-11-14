@@ -27,6 +27,7 @@ const Report = () => {
   const [shareClicked, setShareClicked] = useState(false);
   const [email, setEmail] = useState('');
   const [sending, setSending] = useState(false);
+  const [sendModalOpen, setSendModalOpen] = useState(false);
 
   const getGameName = (gameCode: string) => {
     switch (gameCode) {
@@ -94,7 +95,7 @@ const Report = () => {
     try {
       setSending(true);
       await sendReportEmail(email);
-      alert('리포트 PDF가 입력하신 이메일로 전송되었습니다!');
+      setSendModalOpen(true);
       setShareClicked(false);
       setEmail('');
     } catch (err) {
@@ -122,7 +123,6 @@ const Report = () => {
     <div className="flex flex-col min-h-[calc(100vh-40px)] overflow-y-auto scrollbar px-32 max-md:px-20 py-10">
       <Logo className="absolute top-14 left-8" />
 
-      {/* ❌ BOT_TOKEN 모드에서는 닫기 버튼 표시 X */}
       {!hideCloseButton && (
         <Image
           src={cancelImage}
@@ -279,6 +279,17 @@ const Report = () => {
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
+          </div>
+        </Modal>
+      )}
+
+      {sendModalOpen && (
+        <Modal type="confirm" isCloseBtn={false} onConfirm={() => setSendModalOpen(false)}>
+          <div className="flex flex-col items-center justify-center h-full gap-5">
+            <p className="font-malrang text-5xl text-center">메일로 전송이 완료되었습니다.</p>
+            <p className="text-2xl font-extrabold text-modal-inner-text">
+              최대 5분이 소요될 수 있습니다.
+            </p>
           </div>
         </Modal>
       )}

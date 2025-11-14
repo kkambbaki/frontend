@@ -23,6 +23,7 @@ type GameStats = {
 
 const Round = () => {
   const router = useRouter();
+  const [phase, setPhase] = useState<'observe' | 'memory'>('observe');
 
   // 둥근 테두리를 위한 레이어 생성 (버튼과 동일한 방식)
   const borderLayers = useMemo(() => {
@@ -41,6 +42,10 @@ const Round = () => {
   const [gameStarted, setGameStarted] = useState(false);
   const [round, setRound] = useState(1);
   const [score, setScore] = useState(0);
+
+  useEffect(() => {
+    setPhase('observe'); // 새로운 라운드 시작 → 다시 인지 단계로 초기화
+  }, [round]);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
@@ -263,7 +268,7 @@ const Round = () => {
               <div className="absolute left-1/2 -translate-x-1/2 top-7 z-[50]">
                 <div className="flex flex-col items-center gap-3">
                   <p className="font-malrang text-[40px] text-[#FAFAFA] opacity-0">
-                    {round}라운드: 인지단계
+                    {round}라운드: 인지 단계
                   </p>
 
                   <div className="relative w-[600px] h-[100px] opacity-0">
@@ -363,7 +368,9 @@ const Round = () => {
 
       <div className="absolute left-1/2 -translate-x-1/2 top-7 z-[50]">
         <div className="flex flex-col items-center gap-3">
-          <p className="font-malrang text-[40px] text-[#FAFAFA]">{round}라운드: 인지단계</p>
+          {phase === 'observe' && <p className="text-4xl text-white"> {round}라운드: 인지 단계 </p>}
+
+          {phase === 'memory' && <p className="text-4xl text-white"> {round}라운드: 기억 단계 </p>}
 
           <div className="relative w-[600px] h-[100px]">
             <Image src={starGameProgressBarImage} alt="progress-bar" width={650} className="z-0" />
@@ -416,6 +423,8 @@ const Round = () => {
                     setRound((r) => r + 1);
                   }, 2000);
                 }}
+                phase={phase}
+                onPhaseChange={(newPhase) => setPhase(newPhase)}
               />
             )}
           </div>

@@ -10,6 +10,8 @@ interface GameBoardProps {
   onRoundComplete: () => void;
   onMemoryEnd: () => void;
   onClickResult: (result: { isCorrect: boolean }) => void;
+  phase: 'observe' | 'memory';
+  onPhaseChange: (phase: 'observe' | 'memory') => void;
 }
 
 export default function GameBoard({
@@ -18,6 +20,8 @@ export default function GameBoard({
   onRoundComplete,
   onMemoryEnd,
   onClickResult,
+  phase,
+  onPhaseChange,
 }: GameBoardProps) {
   const [sequence, setSequence] = useState<number[]>([]);
   const [userInput, setUserInput] = useState<number[]>([]);
@@ -47,6 +51,7 @@ export default function GameBoard({
     }
     setIsPlaying(false);
     onMemoryEnd();
+    onPhaseChange('memory');
   }
 
   function startRound() {
