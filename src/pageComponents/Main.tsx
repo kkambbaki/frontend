@@ -103,7 +103,7 @@ const Main = () => {
         </div>
       </div>
       <footer className="relative h-[108px] w-full bg-background-header flex justify-end items-center px-5 md:px-10">
-        <div className="max-md:hidden">
+        <div>
           <div className="absolute bg-main-footer-glow w-[200px] h-1.5 rounded-full bottom-20 left-0"></div>
           <div className="absolute bg-main-footer-glow w-[140px] h-1.5 rounded-full bottom-16 left-10"></div>
           <div className="absolute bg-main-footer-glow w-[250px] h-1.5 rounded-full bottom-2 left-50"></div>
