@@ -62,7 +62,7 @@ const ModalTitle: React.FC<ModalTitleProps> = ({ children, className }) => {
       <span
         className="relative z-30 text-center"
         style={{
-          fontFamily: 'NanumSquareRound, sans-serif',
+          fontFamily: 'NanumSquareRoundExtraBold, sans-serif',
           fontSize: style.fontSize,
           fontStyle: 'normal',
           fontWeight: 800,
