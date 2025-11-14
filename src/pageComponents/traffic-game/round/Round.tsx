@@ -42,6 +42,20 @@ interface RoundDetail {
 
 const Round: React.FC<RoundProps> = ({ onBack }) => {
   const router = useRouter();
+
+  // 둥근 테두리를 위한 레이어 생성 (버튼과 동일한 방식)
+  const borderLayers = useMemo(() => {
+    return [...Array(32)].map((_, i) => {
+      const angle = (i * Math.PI * 2) / 32;
+      const x = Math.cos(angle) * 5;
+      const y = Math.sin(angle) * 5;
+      return {
+        x: x.toFixed(5),
+        y: y.toFixed(5),
+      };
+    });
+  }, []);
+
   const [roundIndex, setRoundIndex] = useState(0);
   const [overlayStep, setOverlayStep] = useState<'round' | 'ready' | 'start' | 'none'>('round');
   const [score, setScore] = useState(0);
@@ -395,19 +409,50 @@ const Round: React.FC<RoundProps> = ({ onBack }) => {
             transition={{ duration: 0.5 }}
             className="absolute inset-0 z-[200] flex items-center justify-center bg-black/40"
           >
-            <p
-              className="font-malrangiche text-[120px]"
+            <span
+              className="font-nanum text-[120px] relative inline-block"
               style={{
-                background: 'linear-gradient(180deg, #FFD359 0%, #FF9F1A 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                WebkitTextStroke: '8px #7F4B1F',
+                position: 'relative',
+                display: 'inline-block',
               }}
             >
-              {overlayStep === 'round' && `${currentRound.round} 라운드`}
-              {overlayStep === 'ready' && '준비'}
-              {overlayStep === 'start' && '시작!'}
-            </p>
+              {/* 보더 효과를 위한 여러 레이어 */}
+              {borderLayers.map((layer, i) => {
+                const scale = 8 / 5; // 8px 테두리를 위해 스케일 조정
+                return (
+                  <span
+                    key={i}
+                    style={{
+                      position: 'absolute',
+                      top: '0',
+                      left: '0',
+                      color: '#7F4B1F',
+                      transform: `translate(${(parseFloat(layer.x) * scale).toFixed(5)}px, ${(parseFloat(layer.y) * scale).toFixed(5)}px)`,
+                      zIndex: 1,
+                      WebkitTextStrokeWidth: 4,
+                    }}
+                  >
+                    {overlayStep === 'round' && `${currentRound.round} 라운드`}
+                    {overlayStep === 'ready' && '준비'}
+                    {overlayStep === 'start' && '시작!'}
+                  </span>
+                );
+              })}
+              {/* 메인 텍스트 레이어 */}
+              <span
+                style={{
+                  position: 'relative',
+                  background: 'linear-gradient(180deg, #FFD359 0%, #FF9F1A 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  zIndex: 2,
+                }}
+              >
+                {overlayStep === 'round' && `${currentRound.round} 라운드`}
+                {overlayStep === 'ready' && '준비'}
+                {overlayStep === 'start' && '시작!'}
+              </span>
+            </span>
           </motion.div>
         )}
       </AnimatePresence>
@@ -426,15 +471,41 @@ const Round: React.FC<RoundProps> = ({ onBack }) => {
 
       <div className="absolute top-[64px] right-[100px] flex items-center gap-[26px]">
         <p className="font-malrangiche text-[30px] text-[#333333]">점수</p>
-        <p
-          className="font-nanum text-[64px] font-bold text-[#FFC738]"
+        <span
+          className="font-sdsamliphopangche text-[64px] relative inline-block"
           style={{
-            WebkitTextStrokeWidth: '4px',
-            WebkitTextStrokeColor: '#7F4F1A',
+            position: 'relative',
+            display: 'inline-block',
           }}
         >
-          {score}
-        </p>
+          {/* 보더 효과를 위한 여러 레이어 */}
+          {borderLayers.map((layer, i) => (
+            <span
+              key={i}
+              style={{
+                position: 'absolute',
+                top: '0',
+                left: '0',
+                color: '#7F4F1A',
+                transform: `translate(${layer.x}px, ${layer.y}px)`,
+                zIndex: 1,
+                WebkitTextStrokeWidth: 3,
+              }}
+            >
+              {score}
+            </span>
+          ))}
+          {/* 메인 텍스트 레이어 */}
+          <span
+            style={{
+              position: 'relative',
+              color: '#FFC738',
+              zIndex: 2,
+            }}
+          >
+            {score}
+          </span>
+        </span>
       </div>
 
       <div className="absolute top-[100px] left-[250px] flex items-center gap-[18px]">

@@ -100,8 +100,17 @@ const Main = () => {
         </div>
       </div>
 
-      {/* 푸터 */}
       <footer className="relative h-[108px] w-full bg-background-header flex justify-end items-center px-5 md:px-10">
+        <div>
+          <div className="absolute bg-main-footer-glow w-[200px] h-1.5 rounded-full bottom-20 left-0"></div>
+          <div className="absolute bg-main-footer-glow w-[140px] h-1.5 rounded-full bottom-16 left-10"></div>
+          <div className="absolute bg-main-footer-glow w-[250px] h-1.5 rounded-full bottom-2 left-50"></div>
+          <div className="absolute bg-main-footer-glow w-[205px] h-1.5 rounded-full bottom-10 left-120"></div>
+          <div className="absolute bg-main-footer-glow w-[120px] h-1.5 rounded-full bottom-14 left-120"></div>
+          <div className="absolute bg-main-footer-glow w-[100px] h-1.5 rounded-full bottom-3 right-0"></div>
+          <div className="absolute bg-main-footer-glow w-[200px] h-1.5 rounded-full bottom-6 right-0"></div>
+          <div className="absolute bg-main-footer-glow w-[200px] h-1.5 rounded-full bottom-20 right-10"></div>
+        </div>
         <div className="flex gap-3">
           <SecondaryButton variant="focusResult" onClick={() => setModal({ type: 'pin' })}>
             집중력 학습 결과
