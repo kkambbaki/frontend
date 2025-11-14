@@ -52,7 +52,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     }, [year, month, variant, onBirthComplete, onBirthChange]);
 
     // 년 / 월 옵션
-    const years = Array.from({ length: 100 }, (_, i) => `${new Date().getFullYear() - i}년`);
+    const startYear = 1990;
+    const endYear = 2022;
+    const years = Array.from({ length: endYear - startYear + 1 }, (_, i) => `${endYear - i}년`);
     const months = Array.from({ length: 12 }, (_, i) => `${i + 1}월`);
 
     const baseClass = cn(
